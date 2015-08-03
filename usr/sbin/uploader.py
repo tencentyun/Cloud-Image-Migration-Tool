@@ -22,8 +22,10 @@ class Uploader(object):
         self.secret_key = secret_key
         self.image_obj = tencentyun.ImageV2(self.appid, self.secret_id, self.secret_key)
 
-    def upload_filename(filename, fileid):
+    def upload_filename(self, filename, fileid):
         response_obj = self.image_obj.upload(filename, self.bucket, fileid)
+
+        print response_obj
         
         # upload success
         if "code" in response_obj and response_obj["code"] == 0:
@@ -31,7 +33,7 @@ class Uploader(object):
         # upload failed
         return 1
 
-    def upload_binary(binary, fileid):
+    def upload_binary(self, binary, fileid):
         response_obj = self.image_obj.upload_binary(binary, self.bucket, fileid)
 
         if "code" in response_obj and response_obj["code"] == 0:

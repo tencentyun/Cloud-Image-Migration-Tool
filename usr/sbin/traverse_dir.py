@@ -30,11 +30,11 @@ if __name__ == "__main__":
                "migrate.type": 2,
                "local.image_root_path": "~/Desktop/testdir",
                #"local.image_root_path": "../../../../Desktop/testdir",
-               "appinfo.appid": 10000037,
+               "appinfo.appid": "10000037",
                "appinfo.secretID": "AKIDpoKBfMK7aYcYNlqxnEtYA1ajAqji2P7T",
                "appinfo.secretKey": "P4FewbltIpGeAbwgdrG6eghMUVlpmjIe",
                "appinfo.bucket": "bucket",
-               "Concurrency": 4
+               "Concurrency": 1
              }
 
     # check config

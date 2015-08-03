@@ -52,11 +52,9 @@ class JobQueue(object):
                 break
             
             print(process_id, "get job: ", job)
-            '''
             if job[0] == 0:
                 slave.upload_filename(job[1], job[2])
             elif job[0] == 1:
                 slave.upload_binary(job[1], job[2])
-            '''
             # TODO: handle error
     
