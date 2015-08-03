@@ -53,8 +53,8 @@ class JobQueue(object):
             
             print(process_id, "get job: ", job)
             if job[0] == 0:
-                slave.upload_filename(job[1], job[2])
+                return_obj = slave.upload_filename(job[1], job[2])
             elif job[0] == 1:
-                slave.upload_binary(job[1], job[2])
+                return_obj = slave.upload_binary(job[1], job[2])
             # TODO: handle error
     
