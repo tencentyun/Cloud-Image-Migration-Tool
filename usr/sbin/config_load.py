@@ -16,6 +16,8 @@
 
 import ConfigParser
 
+# TODO: case insensitive
+
 def load_config(filename):
     config = ConfigParser.ConfigParser()
     config.read(filename)
