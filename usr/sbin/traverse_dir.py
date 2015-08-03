@@ -16,41 +16,53 @@ import sys
 import os
 import re
 
-sys.path.insert(0, "../lib/")
-
-from job_queue import JobQueue
+import config_load
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Error: Command line arguments error. Please view source code to get help. ")
+        exit(1)
+
+    lib_path = str(sys.argv[1])
+    conf_path = str(sys.argv[2])
+
+    if not os.path.isabs(conf_path):
+        print("Error: Configuration path", conf_path, "is not absolute path. ")
+        exit(1)
+
+    if not os.path.isabs(lib_path):
+        print("Error: Library pth", lib_path, "is not absolute path. ")
+        exit(1)
+
+    # non-builtin modules mustn't be loaded before this statement
+    sys.path.insert(0, lib_path)
+    from job_queue import JobQueue
 
     # load config
-    # TODO: test
-    # config = load_config()
-    config = { 
-               "migrate.type": 2,
-               "local.image_root_path": "~/Desktop/testdir",
-               #"local.image_root_path": "../../../../Desktop/testdir",
-               "appinfo.appid": "10000037",
-               "appinfo.secretID": "AKIDpoKBfMK7aYcYNlqxnEtYA1ajAqji2P7T",
-               "appinfo.secretKey": "P4FewbltIpGeAbwgdrG6eghMUVlpmjIe",
-               "appinfo.bucket": "bucket",
-               "Concurrency": 1
-             }
+    config = config_load.load_config(conf_path)
+
+    print(config)
 
     # check config
     mandatory_options = [ 
-                          "migrate.type", 
-                          "local.image_root_path", 
-                          "appinfo.appid", 
-                          "appinfo.secretID",
-                          "appinfo.secretKey",
-                          "appinfo.bucket"
+                          ("MigrateInfo", "migrate.type"),
+                          ("Local", "local.image_root_path"), 
+                          ("AppInfo", "appinfo.appid"), 
+                          ("AppInfo", "appinfo.secretid"),
+                          ("AppInfo", "appinfo.secretkey"),
+                          ("AppInfo", "appinfo.bucket"),
+                          ("ToolConfig", "concurrency")
                         ] 
 
-    for option in mandatory_options:
-        if option not in config:
-            print("Error: Option", option, "is requiret. ")
+    for section, option in mandatory_options:
+        if section not in config or option not in config[section]:
+            print("Error: Option", section + "." + option, "is required. ")
             exit(1)
+
+    if not os.path.isabs(config["Local"]["local.image_root_path"]):
+        print("Error: Image root path", config["Local"]["local.image_root_path"], "is not absolute path")
+        exit(1)
     
     # only filenames matching this regex will be uploaded, others would be ignored
     filename_pattern = re.compile(".*\.(?:jpg|jpeg|png|gif|bmp|webp)$", re.IGNORECASE)
@@ -58,14 +70,14 @@ if __name__ == "__main__":
     # filename_pattern = None
 
     
-    image_root_path = os.path.abspath(os.path.expanduser(config["local.image_root_path"]))
+    image_root_path = os.path.abspath(os.path.expanduser(config["Local"]["local.image_root_path"]))
 
     job_queue = JobQueue(
-                         config["Concurrency"],
-                         config["appinfo.appid"],
-                         config["appinfo.bucket"],
-                         config["appinfo.secretID"],
-                         config["appinfo.secretKey"]
+                         int(config["ToolConfig"]["concurrency"]),
+                         config["AppInfo"]["appinfo.appid"],
+                         config["AppInfo"]["appinfo.bucket"],
+                         config["AppInfo"]["appinfo.secretid"],
+                         config["AppInfo"]["appinfo.secretkey"]
                         )
      
 
