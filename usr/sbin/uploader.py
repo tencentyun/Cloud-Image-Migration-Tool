@@ -25,7 +25,8 @@ class Uploader(object):
     def upload_filename(self, filename, fileid):
         response_obj = self.image_obj.upload(filename, self.bucket, fileid)
 
-        print response_obj
+        if "code" not in response_obj or response_obj["code"] != 0:
+            print(fileid, response_obj)
         
         # upload success
         if "code" in response_obj and response_obj["code"] == 0:

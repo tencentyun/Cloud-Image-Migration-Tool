@@ -11,6 +11,7 @@
  #  Description: 
 ###############################################################################
 
+
 from multiprocessing import Process, Queue
 
 from uploader import Uploader
@@ -33,6 +34,7 @@ class JobQueue(object):
     # job type: 0 -- filename on disk, 1 -- binary data in memory 
     def inqueue(self, job_type, job_obj, job_fileid):
         self.queue.put((job_type, job_obj, job_fileid))
+        print("inqueue:", job_fileid)
 
     def finish(self):
         while not self.queue.empty():
@@ -51,7 +53,7 @@ class JobQueue(object):
             if job == "Finished":
                 break
             
-            print(process_id, "get job: ", job)
+            # print(process_id, "get job: ", job)
             if job[0] == 0:
                 return_obj = slave.upload_filename(job[1], job[2])
             elif job[0] == 1:
