@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # load config
     config = config_load.load_config(conf_path)
 
-    print(config)
+    # print(config)
 
     migrate_type = ("MigrateInfo", "migrate.type")
 
