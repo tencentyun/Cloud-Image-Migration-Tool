@@ -21,13 +21,13 @@ def traverse(config):
     from job_queue import JobQueue
     # check config
     mandatory_options = [ 
-                          ("MigrateInfo", "migrate.type"),
-                          ("Local", "local.image_root_path"), 
-                          ("AppInfo", "appinfo.appid"), 
-                          ("AppInfo", "appinfo.secretid"),
-                          ("AppInfo", "appinfo.secretkey"),
-                          ("AppInfo", "appinfo.bucket"),
-                          ("ToolConfig", "concurrency")
+                          ("migrateinfo", "migrate.type"),
+                          ("local", "local.image_root_path"), 
+                          ("appinfo", "appinfo.appid"), 
+                          ("appinfo", "appinfo.secretid"),
+                          ("appinfo", "appinfo.secretkey"),
+                          ("appinfo", "appinfo.bucket"),
+                          ("toolconfig", "concurrency")
                         ] 
 
     for section, option in mandatory_options:
@@ -35,8 +35,8 @@ def traverse(config):
             print("Error: Option", section + "." + option, "is required. ")
             exit(1)
 
-    if not os.path.isabs(config["Local"]["local.image_root_path"]):
-        print("Error: Image root path", config["Local"]["local.image_root_path"], "is not absolute path")
+    if not os.path.isabs(config["local"]["local.image_root_path"]):
+        print("Error: Image root path", config["local"]["local.image_root_path"], "is not absolute path")
         exit(1)
     
     # only filenames matching this regex will be uploaded, others would be ignored
@@ -45,14 +45,14 @@ def traverse(config):
     # filename_pattern = None
 
     
-    image_root_path = os.path.abspath(os.path.expanduser(config["Local"]["local.image_root_path"]))
+    image_root_path = os.path.abspath(os.path.expanduser(config["local"]["local.image_root_path"]))
 
     job_queue = JobQueue(
-                         int(config["ToolConfig"]["concurrency"]),
-                         config["AppInfo"]["appinfo.appid"],
-                         config["AppInfo"]["appinfo.bucket"],
-                         config["AppInfo"]["appinfo.secretid"],
-                         config["AppInfo"]["appinfo.secretkey"]
+                         int(config["toolconfig"]["concurrency"]),
+                         config["appinfo"]["appinfo.appid"],
+                         config["appinfo"]["appinfo.bucket"],
+                         config["appinfo"]["appinfo.secretid"],
+                         config["appinfo"]["appinfo.secretkey"]
                         )
      
     # traverse dir

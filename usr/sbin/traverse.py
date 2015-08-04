@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # print(config)
 
-    migrate_type = ("MigrateInfo", "migrate.type")
+    migrate_type = ("migrateinfo", "migrate.type")
 
     if migrate_type[0] not in config or migrate_type[1] not in config[migrate_type[0]]:
         print("Error: Option", migrate_type[0] + "." + migrate_type[1], "is required. ")

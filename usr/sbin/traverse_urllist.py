@@ -18,13 +18,13 @@ def traverse(config):
     import urlparse
 
     mandatory_options = [ 
-                          ("MigrateInfo", "migrate.type"),
-                          ("UrlList", "url.url_list_file_path"),
-                          ("AppInfo", "appinfo.appid"), 
-                          ("AppInfo", "appinfo.secretid"),
-                          ("AppInfo", "appinfo.secretkey"),
-                          ("AppInfo", "appinfo.bucket"),
-                          ("ToolConfig", "concurrency")
+                          ("migrateinfo", "migrate.type"),
+                          ("urllist", "url.url_list_file_path"),
+                          ("appinfo", "appinfo.appid"), 
+                          ("appinfo", "appinfo.secretid"),
+                          ("appinfo", "appinfo.secretkey"),
+                          ("appinfo", "appinfo.bucket"),
+                          ("toolconfig", "concurrency")
                         ] 
 
     for section, option in mandatory_options:
@@ -32,18 +32,18 @@ def traverse(config):
             print("Error: Option", section + "." + option, "is required. ")
             exit(1)
 
-    if not os.path.isabs(config["UrlList"]["url.url_list_file_path"]):
+    if not os.path.isabs(config["urllist"]["url.url_list_file_path"]):
         print("Error: URL list file path", config["UrlList"]["url.url_list_file_path"], "is not absolute path")
         exit(1)
 
     urllist_root_path = os.path.abspath(os.path.expanduser(config["UrlList"]["url.url_list_file_path"]))
 
     job_queue = JobQueue(
-                         int(config["ToolConfig"]["concurrency"]),
-                         config["AppInfo"]["appinfo.appid"],
-                         config["AppInfo"]["appinfo.bucket"],
-                         config["AppInfo"]["appinfo.secretid"],
-                         config["AppInfo"]["appinfo.secretkey"]
+                         int(config["toolconfig"]["concurrency"]),
+                         config["appinfo"]["appinfo.appid"],
+                         config["appinfo"]["appinfo.bucket"],
+                         config["appinfo"]["appinfo.secretid"],
+                         config["appinfo"]["appinfo.secretkey"]
                         )
 
     # treverse list
