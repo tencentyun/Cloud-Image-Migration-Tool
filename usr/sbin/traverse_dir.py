@@ -14,6 +14,7 @@
 from __future__ import print_function
 import re
 import os
+import random
 
 
 def traverse(config):
@@ -61,7 +62,7 @@ def traverse(config):
                 continue
             full_name = os.path.join(dirpath, filename)
             # TODO: fileid cannot contain . / and so on
-            fileid = full_name[len(image_root_path) + 1: full_name.find(".")]
+            fileid = str(random.randrange(0, 999999999999999999)) + full_name[len(image_root_path) + 1: full_name.find(".")]
             # print(full_name, ":", fileid)
 
             job_queue.inqueue(0, full_name, fileid)
