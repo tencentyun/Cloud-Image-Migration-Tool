@@ -11,9 +11,10 @@
  #  Description: 
 ###############################################################################
 
-
+from __future__ import print_function
 from multiprocessing import Process, Queue
 import requests
+import urllib
 
 from uploader import Uploader
 
@@ -38,8 +39,16 @@ class JobQueue(object):
     def inqueue(self, job_type, job_obj, job_fileid):
         self.queue.put((job_type, job_obj, job_fileid))
         print("inqueue:", job_fileid)
-
+    
+    def kill(self):
+        # clear job queue
+        while not self.queue.empty():
+            self.queue.get()
+        # wait finish
+        self.finish()
+        
     def finish(self):
+        # TODO: handle when child processes is killed
         while not self.queue.empty():
             pass
 
@@ -56,13 +65,15 @@ class JobQueue(object):
             if job == "Finished":
                 break
             
-            # print(process_id, "get job: ", job)
+            print(process_id, "get job: ", job)
             if job[0] == 0:
                 return_obj = slave.upload_filename(job[1], job[2])
             elif job[0] == 1:
                 return_obj = slave.upload_binary(job[1], job[2])
             elif job[0] == 2:
                 bin_image = urllib.urlopen(job[1]).read()
-                return_obj = slave_upload_binary(bin_image, job[2])
+                #with open("/Users/jamis/Desktop/url/" + job[2].replace("/", "%2f"), "wb") as f:
+                #    f.write(bin_image)
+                return_obj = slave.upload_binary(bin_image, job[2])
             # TODO: handle error
     
