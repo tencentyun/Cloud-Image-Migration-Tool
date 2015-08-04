@@ -19,6 +19,7 @@ import re
 import config_load
 
 
+# command line arguments: lib_path conf_path
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Error: Command line arguments error. Please view source code to get help. ")
