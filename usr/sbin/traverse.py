@@ -16,7 +16,8 @@ import sys
 import os
 
 import config_load
-import traverse_dir
+import traverse_dir 
+import traverse_urllist 
 
 
 
@@ -45,6 +46,17 @@ if __name__ == "__main__":
 
     print(config)
 
-    traverse_dir.traverse_dir(config)
+    migrate_type = ("MigrateInfo", "migrate.type")
+
+    if migrate_type[0] not in config or migrate_type[1] not in config[migrate_type[0]]:
+        print("Error: Option", migrate_type[0] + "." + migrate_type[1], "is required. ")
+
+    traverse_functions = [ 
+                           traverse_dir.traverse,
+                           traverse_urllist.traverse,
+                           # traverse_qiniu
+                         ]
+
+    traverse_functions[int(config[migrate_type[0]][migrate_type[1]]) - 1](config)
 
 
