@@ -11,11 +11,12 @@
  #  Description: 
 ###############################################################################
 
+from __future__ import print_function
 import re
 import os
 
 
-def traverse_dir(config):
+def traverse(config):
     from job_queue import JobQueue
     # check config
     mandatory_options = [ 
@@ -60,7 +61,7 @@ def traverse_dir(config):
                 continue
             full_name = os.path.join(dirpath, filename)
             fileid = full_name[len(image_root_path) + 1:]
-            #print(full_name, ":", fileid)
+            # print(full_name, ":", fileid)
 
             job_queue.inqueue(0, full_name, fileid)
 
