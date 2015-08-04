@@ -13,6 +13,7 @@
 
 
 from multiprocessing import Process, Queue
+import requests
 
 from uploader import Uploader
 
@@ -31,7 +32,9 @@ class JobQueue(object):
             self.slave_processes.append(slave_process)
 
     # push a job into queue
-    # job type: 0 -- filename on disk, 1 -- binary data in memory 
+    # job type: 0 -- filename on disk, 
+    #           1 -- binary data in memory 
+    #           2 -- url
     def inqueue(self, job_type, job_obj, job_fileid):
         self.queue.put((job_type, job_obj, job_fileid))
         print("inqueue:", job_fileid)
@@ -58,5 +61,8 @@ class JobQueue(object):
                 return_obj = slave.upload_filename(job[1], job[2])
             elif job[0] == 1:
                 return_obj = slave.upload_binary(job[1], job[2])
+            elif job[0] == 2:
+                bin_image = urllib.urlopen(job[1]).read()
+                return_obj = slave_upload_binary(bin_image, job[2])
             # TODO: handle error
     
