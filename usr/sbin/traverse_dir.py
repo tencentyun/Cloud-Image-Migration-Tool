@@ -60,7 +60,8 @@ def traverse(config):
             if filename_pattern and not filename_pattern.match(filename):
                 continue
             full_name = os.path.join(dirpath, filename)
-            fileid = full_name[len(image_root_path) + 1:]
+            # TODO: fileid cannot contain . / and so on
+            #fileid = full_name[len(image_root_path) + 1: full_name.find(".")]
             # print(full_name, ":", fileid)
 
             job_queue.inqueue(0, full_name, fileid)
