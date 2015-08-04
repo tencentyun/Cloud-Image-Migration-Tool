@@ -23,27 +23,22 @@ class Uploader(object):
         self.secret_key = secret_key
         self.image_obj = tencentyun.ImageV2(self.appid, self.secret_id, self.secret_key)
 
+    # return (0, info) on success
+    # return (1, info) on failure
     def upload_filename(self, filename, fileid):
         response_obj = self.image_obj.upload(filename, self.bucket, fileid)
         
-
-        if "code" not in response_obj or response_obj["code"] != 0:
-            print(fileid, response_obj)
-        else:
-            print(response_obj["data"]["download_url"])
-        
-        # upload success
         if "code" in response_obj and response_obj["code"] == 0:
-            return 0
-        # upload failed
-        return 1
+            return (0, "file id == " + fileid + ", download URL == " + response_obj["data"]["download_url"])
+        else:
+            return (1, "file id == " + fileid + ", response packet == " + str(response_obj))
+        
 
     def upload_binary(self, binary, fileid):
         response_obj = self.image_obj.upload_binary(binary, self.bucket, fileid)
 
-        if "code" not in response_obj or response_obj["code"] != 0:
-            print(fileid, response_obj)
-
         if "code" in response_obj and response_obj["code"] == 0:
-            return 0
-        return 1
+            return (0, "file id == " + fileid + ", download URL == " + response_obj["data"]["download_url"])
+        else:
+            return (1, "file id == " + fileid + ", response packet == " + str(response_obj))
+        

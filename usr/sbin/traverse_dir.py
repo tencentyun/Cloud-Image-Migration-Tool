@@ -12,6 +12,7 @@
 ###############################################################################
 
 from __future__ import print_function
+from multiprocessing import Queue
 import re
 import os
 import random
@@ -47,12 +48,16 @@ def traverse(config):
     
     image_root_path = os.path.abspath(os.path.expanduser(config["local"]["local.image_root_path"]))
 
+    message_queue = Queue()
+    
+    num_processes = int(config["toolconfig"]["concurrency"])
     job_queue = JobQueue(
-                         int(config["toolconfig"]["concurrency"]),
+                         num_processes,
                          config["appinfo"]["appinfo.appid"],
                          config["appinfo"]["appinfo.bucket"],
                          config["appinfo"]["appinfo.secretid"],
-                         config["appinfo"]["appinfo.secretkey"]
+                         config["appinfo"]["appinfo.secretkey"],
+                         message_queue
                         )
      
     # traverse dir
@@ -66,6 +71,28 @@ def traverse(config):
             # print(full_name, ":", fileid)
 
             job_queue.inqueue(0, full_name, fileid)
+    
+    # Queue is FIFO, so put finish flags after all jobs
+    job_queue.inqueue_finish_flags()
+     
+    num_finished = 0
+    while True:
+        message = message_queue.get()
+        
+        # success
+        if message[0] == 0:
+            pass
+            print(message)
+            # TODO write to log
+        # failure
+        elif message[0] == 1:
+            pass
+            print(message)
+        # job finish
+        elif message[0] == 2:
+            num_finished += 1
+            if num_finished == num_processes:
+                break
 
     job_queue.finish()
 
