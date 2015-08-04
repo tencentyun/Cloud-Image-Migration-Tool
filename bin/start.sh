@@ -25,4 +25,4 @@ LIB_PATH=$(get_abs_path $LIB_PATH)
 CONF_PATH=$(get_abs_path $CONF_PATH)
 
 
-python ${SBIN_PATH}/traverse_dir.py $LIB_PATH $CONF_PATH
+python ${SBIN_PATH}/traverse.py $LIB_PATH $CONF_PATH

@@ -18,33 +18,7 @@ import re
 
 import config_load
 
-
-# command line arguments: lib_path conf_path
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Error: Command line arguments error. Please view source code to get help. ")
-        exit(1)
-
-    lib_path = str(sys.argv[1])
-    conf_path = str(sys.argv[2])
-
-    if not os.path.isabs(conf_path):
-        print("Error: Configuration path", conf_path, "is not absolute path. ")
-        exit(1)
-
-    if not os.path.isabs(lib_path):
-        print("Error: Library pth", lib_path, "is not absolute path. ")
-        exit(1)
-
-    # non-builtin modules mustn't be loaded before this statement
-    sys.path.insert(0, lib_path)
-    from job_queue import JobQueue
-
-    # load config
-    config = config_load.load_config(conf_path)
-
-    print(config)
-
+def traverse_dir(config):
     # check config
     mandatory_options = [ 
                           ("MigrateInfo", "migrate.type"),
@@ -81,8 +55,6 @@ if __name__ == "__main__":
                          config["AppInfo"]["appinfo.secretkey"]
                         )
      
-
-
     # traverse dir
     for dirpath, dirs, files in os.walk(image_root_path):
         for filename in files:
@@ -95,4 +67,35 @@ if __name__ == "__main__":
             job_queue.inqueue(0, full_name, fileid)
 
     job_queue.finish()
+
+
+
+# command line arguments: lib_path conf_path
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Error: Command line arguments error. Please view source code to get help. ")
+        exit(1)
+
+    lib_path = str(sys.argv[1])
+    conf_path = str(sys.argv[2])
+
+    if not os.path.isabs(conf_path):
+        print("Error: Configuration path", conf_path, "is not absolute path. ")
+        exit(1)
+
+    if not os.path.isabs(lib_path):
+        print("Error: Library pth", lib_path, "is not absolute path. ")
+        exit(1)
+
+    # non-builtin modules mustn't be loaded before this statement
+    sys.path.insert(0, lib_path)
+    from job_queue import JobQueue
+
+    # load config
+    config = config_load.load_config(conf_path)
+
+    print(config)
+
+    traverse_dir(config)
+
 
