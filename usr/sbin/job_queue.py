@@ -38,7 +38,7 @@ class JobQueue(object):
     #           2 -- url
     def inqueue(self, job_type, job_obj, job_fileid):
         self.queue.put((job_type, job_obj, job_fileid))
-        print("inqueue:", job_fileid)
+        # print("inqueue:", job_fileid)
     
     def kill(self):
         # clear job queue
@@ -65,7 +65,7 @@ class JobQueue(object):
             if job == "Finished":
                 break
             
-            print(process_id, "get job: ", job)
+            # print(process_id, "get job: ", job)
             if job[0] == 0:
                 return_obj = slave.upload_filename(job[1], job[2])
             elif job[0] == 1:
