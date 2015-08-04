@@ -12,6 +12,7 @@
 ###############################################################################
 
 
+from __future__ import print_function
 import tencentyun
 
 class Uploader(object):
@@ -36,6 +37,9 @@ class Uploader(object):
 
     def upload_binary(self, binary, fileid):
         response_obj = self.image_obj.upload_binary(binary, self.bucket, fileid)
+
+        if "code" not in response_obj or response_obj["code"] != 0:
+            print(fileid, response_obj)
 
         if "code" in response_obj and response_obj["code"] == 0:
             return 0
