@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import pkg_resources
+#import pkg_resources
 import platform
 
 API_IMAGE_END_POINT = 'http://web.image.myqcloud.com/photos/v1/'
