@@ -29,7 +29,7 @@ def traverse(config, log_path):
                           ("appinfo", "appinfo.secretid"),
                           ("appinfo", "appinfo.secretkey"),
                           ("appinfo", "appinfo.bucket"),
-                          ("toolconfig", "concurrency")
+                          ("toolconfig", "concurrency"),
                         ] 
 
     for section, option in mandatory_options:
@@ -58,7 +58,7 @@ def traverse(config, log_path):
                          config["appinfo"]["appinfo.bucket"],
                          config["appinfo"]["appinfo.secretid"],
                          config["appinfo"]["appinfo.secretkey"],
-                         message_queue
+                         message_queue,
                         )
      
     # traverse dir
