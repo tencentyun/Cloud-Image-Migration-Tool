@@ -12,7 +12,6 @@
 ###############################################################################
 
 from __future__ import print_function
-#from multiprocessing import Process, Queue
 import Queue
 import multiprocessing
 import requests
