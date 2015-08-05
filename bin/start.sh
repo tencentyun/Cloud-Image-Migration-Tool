@@ -13,7 +13,7 @@
 SBIN_PATH="../usr/sbin/"
 LIB_PATH="../usr/lib/"
 CONF_PATH="../conf/config.ini"
-
+LOG_PATH="../log/"
 function get_abs_path() {
     (
     cd $(dirname $1)
@@ -23,6 +23,6 @@ function get_abs_path() {
 
 LIB_PATH=$(get_abs_path $LIB_PATH)
 CONF_PATH=$(get_abs_path $CONF_PATH)
+LOG_PATH=$(get_abs_path $LOG_PATH)
 
-
-python ${SBIN_PATH}/traverse.py $LIB_PATH $CONF_PATH
+python ${SBIN_PATH}/traverse.py $LIB_PATH $CONF_PATH $LOG_PATH

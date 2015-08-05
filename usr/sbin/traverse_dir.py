@@ -16,9 +16,10 @@ from multiprocessing import Queue
 import re
 import os
 import random
+import time
 
 
-def traverse(config):
+def traverse(config, log_path):
     from job_queue import JobQueue
     # check config
     mandatory_options = [ 
@@ -76,24 +77,24 @@ def traverse(config):
     job_queue.inqueue_finish_flags()
      
     num_finished = 0
-    while True:
-        message = message_queue.get()
-        
-        # success
-        if message[0] == 0:
-            pass
-            print(message)
-            # TODO write to log
-        # failure
-        elif message[0] == 1:
-            pass
-            print(message)
-        # job finish
-        elif message[0] == 2:
-            num_finished += 1
-            if num_finished == num_processes:
-                break
+    with open(os.path.join(log_path, "stdout"), "w") as stdout, open(os.path.join(log_path, "stderr"), "w") as stderr:
+        while True:
+            message = message_queue.get()
+            
+            # success
+            if message[0] == 0:
+                stdout.write("%s: %s\n" % (time.asctime(), message))
+            # failure
+            elif message[0] == 1:
+                stderr.write("%s: %s\n" % (time.asctime(), message))
+            # job finish
+            elif message[0] == 2:
+                num_finished += 1
+                stdout.write("%s: %d of %d processes finished \n" % (time.asctime(), num_finished, num_processes))
+                if num_finished == num_processes:
+                    break
 
-    job_queue.finish()
+        job_queue.finish()
+        stdout.write("%s: master process finished \n" % time.asctime())
 
 
