@@ -46,6 +46,8 @@ with open("stderr") as f1, open("stdout") as f2:
     extract_fileid(f1)
     extract_fileid(f2)
 
+print("%d file ids" % len(fileid_list))
+
 pool = Pool(10)
 pool.map(do_delete, fileid_list)
 
