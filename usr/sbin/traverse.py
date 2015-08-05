@@ -52,7 +52,7 @@ if __name__ == "__main__":
         print("Error: Log path", log_path, "is not directory or not exists. ")
         exit(1)
     
-    log_files = [ "stdout", "stderr", ]
+    log_files = [ "stdout", "stderr", "pid" ]
     log_files = [ os.path.join(log_path, x) for x in log_files ] 
 
     for log_file in log_files:
@@ -75,6 +75,7 @@ if __name__ == "__main__":
 
     if migrate_type[0] not in config or migrate_type[1] not in config[migrate_type[0]]:
         print("Error: Option", migrate_type[0] + "." + migrate_type[1], "is required. ")
+        exit(1)
 
     traverse_functions = [ 
                            traverse_dir.traverse,
@@ -82,8 +83,8 @@ if __name__ == "__main__":
                            # other traverse methods
                          ]
 
-    #traverse_functions[int(config[migrate_type[0]][migrate_type[1]]) - 1](config, log_path)
-
+    with open(os.path.join(log_path, "pid"), "w") as f:
+        f.write(str(os.getpid()))
 
     # start parallel uploading
     try:
