@@ -84,13 +84,23 @@ if __name__ == "__main__":
                          ]
 
     with open(os.path.join(log_path, "pid"), "w") as f:
-        f.write(str(os.getpid()))
+        f.write(str(os.getpid()) + "\n") 
 
     # start parallel uploading
     try:
         message_queue = multiprocessing.Queue()
         
         num_processes = int(config["toolconfig"]["concurrency"])
+        
+        pid_file = open(os.path.join(log_path, "pid"), "a");
+
+        # Note that pids of child processes must be flushed to on-disk file immediately it starts
+        # or there's a risk of resouce leak
+        def write_pid_log(pid):
+            pid_file.write(str(pid) + "\n")
+            pid_file.flush()
+            
+
         job_queue = JobQueue(
                              num_processes,
                              config["appinfo"]["appinfo.appid"],
@@ -98,7 +108,10 @@ if __name__ == "__main__":
                              config["appinfo"]["appinfo.secretid"],
                              config["appinfo"]["appinfo.secretkey"],
                              message_queue,
+                             write_pid_log,
                             )
+        
+        pid_file.close()
          
         # traverse dir OR traver urllist OR other methods
         traverse_functions[int(config[migrate_type[0]][migrate_type[1]]) - 1](config, log_path, job_queue)

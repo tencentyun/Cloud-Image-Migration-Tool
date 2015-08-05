@@ -17,18 +17,22 @@ import multiprocessing
 import requests
 import urllib
 import signal
+import os
 
 from uploader import Uploader
 
 class JobQueue(object):
     # number of uploaders
-    def __init__(self, num_uploaders, appid, bucket, secret_id, secret_key, message_queue):
+    def __init__(self, num_uploaders, appid, bucket, secret_id, secret_key, message_queue, pid_log):
         self.queue = multiprocessing.Queue()
         self.slave_processes = []
+        pid_log_lock = multiprocessing.Lock()
         for i in range(num_uploaders):
             slave = Uploader(appid, bucket, secret_id, secret_key)
             
-            slave_process = multiprocessing.Process(target = self.dequeue, args = (i, slave, message_queue ))
+            slave_process = multiprocessing.Process(
+                target = self.dequeue, 
+                args = (i, slave, message_queue, pid_log, pid_log_lock ))
             slave_process.daemon = True
             slave_process.start()
 
@@ -62,7 +66,10 @@ class JobQueue(object):
         for process in self.slave_processes:
             process.join()
 
-    def dequeue(self, process_id, slave, message_queue):
+    def dequeue(self, process_id, slave, message_queue, pid_log, pid_log_lock):
+        with pid_log_lock:
+            pid_log(os.getpid())
+
         def ignore(signal, frame):
             pass
 
