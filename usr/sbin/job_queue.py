@@ -45,7 +45,6 @@ class JobQueue(object):
     
     # block until all child processes end
     def finish(self):
-
         for process in self.slave_processes:
             process.join()
 
