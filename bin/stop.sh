@@ -1,9 +1,6 @@
 #!/bin/sh
 ###############################################################################
  #  Copyright (c) 2015 Jamis Hoo
- #  Distributed under the MIT license 
- #  (See accompanying file LICENSE or copy at http://opensource.org/licenses/MIT)
- #  
  #  Project: 
  #  Filename: stop.sh 
  #  Version: 1.0
