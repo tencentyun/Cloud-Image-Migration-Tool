@@ -12,21 +12,24 @@
 ###############################################################################
 
 from __future__ import print_function
-from multiprocessing import Process, Queue
+#from multiprocessing import Process, Queue
+import Queue
+import multiprocessing
 import requests
 import urllib
+import signal
 
 from uploader import Uploader
 
 class JobQueue(object):
     # number of uploaders
     def __init__(self, num_uploaders, appid, bucket, secret_id, secret_key, message_queue):
-        self.queue = Queue()
+        self.queue = multiprocessing.Queue()
         self.slave_processes = []
         for i in range(num_uploaders):
             slave = Uploader(appid, bucket, secret_id, secret_key)
             
-            slave_process = Process(target = self.dequeue, args = (i, slave, message_queue ))
+            slave_process = multiprocessing.Process(target = self.dequeue, args = (i, slave, message_queue ))
             slave_process.daemon = True
             slave_process.start()
 
@@ -43,12 +46,29 @@ class JobQueue(object):
         for _ in range(len(self.slave_processes)):
             self.queue.put("Finished")
     
+    # delete all jobs already submited, wait until all subprocesses quit
+    def stop(self):
+        # clear queue
+        while True:
+            try:
+                self.queue.get_nowait()
+            except Queue.Empty:
+                break
+        
+        self.inqueue_finish_flags()
+        self.finish()
+
     # block until all child processes end
     def finish(self):
         for process in self.slave_processes:
             process.join()
 
     def dequeue(self, process_id, slave, message_queue):
+        def ignore(signal, frame):
+            pass
+
+        signal.signal(signal.SIGINT, ignore)
+
         while True:
             job = self.queue.get()
             
