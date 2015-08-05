@@ -60,8 +60,8 @@ def traverse(config, log_path):
             fileid = urlparse.urlparse(url).path
             if len(fileid) and fileid[0] == '/':
                 # TODO: for now fileid cannot contains . /
-                #fileid = fileid[1: ]
-                fileid = str(random.randrange(0, 999999999999999999999999999999999999999999))
+                fileid = fileid[1: ]
+                #fileid = str(random.randrange(0, 999999999999999999999999999999999999999999))
             #print(url)
             #print(fileid)
             job_queue.inqueue(2, url, fileid)
