@@ -1,8 +1,0 @@
-# Python
-*.pyc
-
-# OS X
-*.DS_Store
-
-# vim
-*.swp
