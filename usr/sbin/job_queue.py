@@ -57,16 +57,19 @@ class JobQueue(object):
                 message_queue.put((2,))
                 break
             
-            if job[0] == 0:
-                return_obj = slave.upload_filename(job[1], job[2])
-            elif job[0] == 1:
-                return_obj = slave.upload_binary(job[1], job[2])
-            elif job[0] == 2:
-                bin_image = urllib.urlopen(job[1]).read()
-                #with open("/Users/jamis/Desktop/url/" + job[2].replace("/", "%2f"), "wb") as f:
-                #    f.write(bin_image)
-                return_obj = slave.upload_binary(bin_image, job[2])
+            try:
+                if job[0] == 0:
+                    return_obj = slave.upload_filename(job[1], job[2])
+                elif job[0] == 1:
+                    return_obj = slave.upload_binary(job[1], job[2])
+                elif job[0] == 2:
+                    bin_image = urllib.urlopen(job[1]).read()
+                    #with open("/Users/jamis/Desktop/url/" + job[2].replace("/", "%2f"), "wb") as f:
+                    #    f.write(bin_image)
+                    return_obj = slave.upload_binary(bin_image, job[2])
+                message_queue.put(return_obj)
+            except Exception as e:
+                message_queue.put((1, "file id == " + job[2] + ", exception: " + str(e)))
             
-            message_queue.put(return_obj)
 
     
