@@ -8,7 +8,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  4, 2015
  #  Time: 12:22:42
- #  Description: 
+ #  Description: traverse over a root directory 
 ###############################################################################
 
 from __future__ import print_function

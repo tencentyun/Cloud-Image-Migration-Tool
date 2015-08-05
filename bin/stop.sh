@@ -8,7 +8,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  5, 2015
  #  Time: 16:23:11
- #  Description: 
+ #  Description: stop
 ###############################################################################
 
 LOG_PATH="../log/"

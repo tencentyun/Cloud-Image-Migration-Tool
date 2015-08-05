@@ -8,7 +8,9 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  3, 2015
  #  Time: 14:06:02
- #  Description: 
+ #  Description: call different traverse functions to load jobs
+ #               manage status of jobs 
+ #               log
 ###############################################################################
 
 from __future__ import print_function

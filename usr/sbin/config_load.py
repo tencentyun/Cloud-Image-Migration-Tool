@@ -8,7 +8,8 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  3, 2015
  #  Time: 17:12:54
- #  Description: 
+ #  Description: load ini file
+ #               node that section and options names are case insensitive
 ###############################################################################
 
 import ConfigParser

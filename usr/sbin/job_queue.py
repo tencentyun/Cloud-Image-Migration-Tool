@@ -8,7 +8,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  3, 2015
  #  Time: 13:49:09
- #  Description: 
+ #  Description: a queue to manage jobs and slave workers
 ###############################################################################
 
 from __future__ import print_function

@@ -8,7 +8,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  5, 2015
  #  Time: 12:45:42
- #  Description: 
+ #  Description: delete all files on server according to fileids in log
 ###############################################################################
 
 from __future__ import print_function

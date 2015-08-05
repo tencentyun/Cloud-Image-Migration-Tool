@@ -8,7 +8,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  5, 2015
  #  Time: 17:46:20
- #  Description: 
+ #  Description: clean logs
 ###############################################################################
 
 LOG_PATH="../log/"

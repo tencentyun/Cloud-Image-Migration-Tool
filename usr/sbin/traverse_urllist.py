@@ -8,7 +8,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  4, 2015
  #  Time: 12:28:25
- #  Description: 
+ #  Description: traverse a file consisting of URLs
 ###############################################################################
 
 from multiprocessing import Queue
