@@ -67,8 +67,8 @@ def traverse(config, log_path):
             if filename_pattern and not filename_pattern.match(filename):
                 continue
             full_name = os.path.join(dirpath, filename)
-            # TODO: fileid cannot contain . / and so on
-            fileid = str(random.randrange(0, 999999999999999999)) + full_name[len(image_root_path) + 1: full_name.find(".")]
+            fileid = full_name[len(image_root_path) + 1: ]
+            # fileid = str(random.randrange(0, 999999999999999999)) + full_name[len(image_root_path) + 1: full_name.find(".")]
             # print(full_name, ":", fileid)
 
             job_queue.inqueue(0, full_name, fileid)
