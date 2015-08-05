@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 ###############################################################################
  #  Copyright (c) 2015 Jamis Hoo
- #  Distributed under the MIT license 
- #  (See accompanying file LICENSE or copy at http://opensource.org/licenses/MIT)
- #  
  #  Project: 
  #  Filename: config_load.py 
  #  Version: 1.0
