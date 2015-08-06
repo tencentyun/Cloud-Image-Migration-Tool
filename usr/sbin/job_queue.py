@@ -54,10 +54,12 @@ class JobQueue(object):
 
     # this function must be called when queue is empty
     def fill_queue(self):
+        fill_count = 0
         while self.ready_queue_index < len(self.ready_queue):
             try:
                 self.queue.put_nowait(self.ready_queue[self.ready_queue_index])
                 self.ready_queue_index += 1
+                fill_count += 1
             except Queue.Full:
                 break
 
@@ -68,12 +70,16 @@ class JobQueue(object):
     # delete all jobs already submited, wait until all subprocesses quit
     def stop(self):
         # clear queue
+        job_num = 0
         while True:
             try:
-                self.queue.get_nowait()
+                # see https://bugs.python.org/issue20147
+                self.queue.get(True, 0.01)
+                job_num += 1
             except Queue.Empty:
                 break
-        
+        print("delete %d undone jobs" % job_num)
+
         # ignore jobs in ready_queue
         self.ready_queue_index = len(self.ready_queue)
         self.inqueue_finish_flags()
