@@ -8,6 +8,7 @@
 log/stdout
 log/stderr
 log/pid
+log/state
 
 # Python
 *.pyc
