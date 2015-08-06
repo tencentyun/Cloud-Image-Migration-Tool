@@ -15,7 +15,7 @@ from multiprocessing import Queue
 
 import os
 
-def traverse(config, log_path, job_queue):
+def traverse(config, log_path, job_queue, skip):
     import urlparse
 
     mandatory_options = [ 
@@ -39,14 +39,22 @@ def traverse(config, log_path, job_queue):
 
     urllist_root_path = os.path.abspath(os.path.expanduser(config["urllist"]["url.url_list_file_path"]))
 
-
+    # number of submited = totoal
+    # number of skipped = already uploaded last time 
+    num_submited = 0
+    num_skipped = 0
     # treverse list
     with open(urllist_root_path) as f:
         for url in f:
             fileid = urlparse.urlparse(url).path
             if len(fileid) and fileid[0] == '/':
                 fileid = fileid[1: ]
-            job_queue.inqueue(2, url, fileid)
 
+            num_submited += 1
+            if fileid not in skip:
+                job_queue.inqueue(2, url, fileid)
+            else:
+                num_skipped += 1
 
+    return (num_submited, num_skipped)
 

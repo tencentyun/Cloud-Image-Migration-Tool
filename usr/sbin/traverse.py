@@ -16,6 +16,7 @@
 from __future__ import print_function
 import sys
 import os
+import re
 import multiprocessing
 import time
 import Queue
@@ -54,14 +55,24 @@ if __name__ == "__main__":
         print("Error: Log path", log_path, "is not directory or not exists. ")
         exit(1)
     
-    log_files = [ "stdout", "stderr", "pid" ]
-    log_files = [ os.path.join(log_path, x) for x in log_files ] 
+    #log_files = [ "stdout", "stderr", "pid" ]
+    #log_files = [ os.path.join(log_path, x) for x in log_files ] 
 
+    skip = set()
+    if os.path.exists(os.path.join(log_path, "stdout")):
+        with open(os.path.join(log_path, "stdout")) as accomplished:
+            for line in accomplished:
+                match_result = re.match("^.*file id == ([^,\n]+),?.*$", line)
+                if match_result and len(match_result.groups()):
+                    fileid = match_result.groups()[0]
+                    skip.add(fileid)
+
+    '''
     for log_file in log_files:
         if os.path.exists(log_file):
             print("Error:", log_file, "alreadty exists. ")
             exit(1)
-
+    '''
 
 
     # non-builtin modules mustn't be loaded before this statement
@@ -116,15 +127,22 @@ if __name__ == "__main__":
         pid_file.close()
          
         # traverse dir OR traver urllist OR other methods
-        traverse_functions[int(config[migrate_type[0]][migrate_type[1]]) - 1](config, log_path, job_queue)
+        num_submited, num_skipped = \
+            traverse_functions[int(config[migrate_type[0]][migrate_type[1]]) - 1](config, log_path, job_queue, skip)
+        num_failed, num_successful = 0, num_skipped
 
         # Queue is FIFO, so put finish flags after all jobs
         job_queue.inqueue_finish_flags()
          
         num_finished = 0
 
-        stdout = open(os.path.join(log_path, "stdout"), "w")
+        # if proceed unfinished jobs, stdout will be appeneded, stderr will be overwritten
+        stdout = open(os.path.join(log_path, "stdout"), "a")
         stderr = open(os.path.join(log_path, "stderr"), "w")
+        state_flush_time = 0
+        state_flush_interval = 0.5
+        state = open(os.path.join(log_path, "state"), "w")
+
         # receive message from child processes, write to log
         while True:
             message = message_queue.get()
@@ -132,15 +150,24 @@ if __name__ == "__main__":
             # success
             if message[0] == 0:
                 stdout.write("%s: %s\n" % (time.asctime(), message[1]))
+                num_successful += 1
             # failure
             elif message[0] == 1:
                 stderr.write("%s: %s\n" % (time.asctime(), message[1]))
+                num_failed += 1
             # job finish
             elif message[0] == 2:
                 num_finished += 1
                 stdout.write("%s: %d of %d processes finished \n" % (time.asctime(), num_finished, num_processes))
                 if num_finished == num_processes:
+                    state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                    state.flush()
                     break
+
+            if time.time() - state_flush_time > state_flush_interval:
+                state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                state.flush()
+                state_flush_time = time.time()
 
         job_queue.finish()
         stdout.write("%s: master process finished \n" % time.asctime())
@@ -156,21 +183,36 @@ if __name__ == "__main__":
                     # success
                     if message[0] == 0 and "stdout" in locals():
                         stdout.write("%s: %s\n" % (time.asctime(), message[1]))
+                        num_successful += 1
                     # failure
                     elif message[0] == 1 and "stderr" in locals():
                         stderr.write("%s: %s\n" % (time.asctime(), message[1]))
+                        num_failed += 1
                     # job finish
                     elif message[0] == 2 and "stdout" in locals():
                         num_finished += 1
                         stdout.write("%s: %d of %d processes interrupted \n" % (time.asctime(), num_finished, num_processes))
+                    
+                    if "state" in locals() and time.time() - state_flush_time > state_flush_interval:
+                        state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                        state.flush()
+                        state_flush_time = time.time()
+
                 except Queue.Empty:
+                    if "state" in locals():
+                        state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                        state.flush()
                     break
             if "stdout" in locals():
                 stdout.write("%s: master process interrupted \n" % time.asctime())
     finally:
+        if "pid_file" in locals():
+            pid_file.close()
         if "stdout" in locals():
             stdout.close()
         if "stderr" in locals():
             stderr.close()
+        if "state" in locals():
+            state.close()
 
 

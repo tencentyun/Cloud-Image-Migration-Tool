@@ -16,7 +16,7 @@ import re
 import os
 
 
-def traverse(config, log_path, job_queue):
+def traverse(config, log_path, job_queue, skip):
     # check config
     mandatory_options = [ 
                           ("migrateinfo", "migrate.type"),
@@ -45,7 +45,10 @@ def traverse(config, log_path, job_queue):
     
     image_root_path = os.path.abspath(os.path.expanduser(config["local"]["local.image_root_path"]))
 
-         
+    # number of submited = totoal
+    # number of skipped = already uploaded last time 
+    num_submited = 0
+    num_skipped = 0
     # traverse dir and submit job to job queue
     for dirpath, dirs, files in os.walk(image_root_path):
         for filename in files:
@@ -54,5 +57,11 @@ def traverse(config, log_path, job_queue):
             full_name = os.path.join(dirpath, filename)
             fileid = full_name[len(image_root_path) + 1: ]
 
-            job_queue.inqueue(0, full_name, fileid)
+            num_submited += 1
+            if fileid not in skip:
+                job_queue.inqueue(0, full_name, fileid)
+            else:
+                num_skipped += 1
+
+    return (num_submited, num_skipped)
     
