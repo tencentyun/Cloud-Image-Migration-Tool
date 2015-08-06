@@ -131,10 +131,10 @@ if __name__ == "__main__":
             
             # success
             if message[0] == 0:
-                stdout.write("%s: %s\n" % (time.asctime(), message))
+                stdout.write("%s: %s\n" % (time.asctime(), message[1]))
             # failure
             elif message[0] == 1:
-                stderr.write("%s: %s\n" % (time.asctime(), message))
+                stderr.write("%s: %s\n" % (time.asctime(), message[1]))
             # job finish
             elif message[0] == 2:
                 num_finished += 1
@@ -155,10 +155,10 @@ if __name__ == "__main__":
                     
                     # success
                     if message[0] == 0 and "stdout" in locals():
-                        stdout.write("%s: %s\n" % (time.asctime(), message))
+                        stdout.write("%s: %s\n" % (time.asctime(), message[1]))
                     # failure
                     elif message[0] == 1 and "stderr" in locals():
-                        stderr.write("%s: %s\n" % (time.asctime(), message))
+                        stderr.write("%s: %s\n" % (time.asctime(), message[1]))
                     # job finish
                     elif message[0] == 2 and "stdout" in locals():
                         num_finished += 1

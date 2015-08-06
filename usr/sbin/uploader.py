@@ -29,7 +29,7 @@ class Uploader(object):
         response_obj = self.image_obj.upload(filename, self.bucket, fileid)
         
         if "code" in response_obj and response_obj["code"] == 0:
-            return (0, "file id == " + fileid + ", download URL == " + response_obj["data"]["download_url"])
+            return (0, "file id == " + fileid)
         else:
             return (1, "file id == " + fileid + ", response packet == " + str(response_obj))
         
@@ -38,7 +38,7 @@ class Uploader(object):
         response_obj = self.image_obj.upload_binary(binary, self.bucket, fileid)
 
         if "code" in response_obj and response_obj["code"] == 0:
-            return (0, "file id == " + fileid + ", download URL == " + response_obj["data"]["download_url"])
+            return (0, "file id == " + fileid)
         else:
             return (1, "file id == " + fileid + ", response packet == " + str(response_obj))
         
