@@ -43,9 +43,10 @@ def do_delete(fileid):
     except Exception:
         pass
 
-with open("stderr") as f1, open("stdout") as f2:
-    extract_fileid(f1)
-    extract_fileid(f2)
+with open("stderr") as f1:
+	with open("stdout") as f2:
+		extract_fileid(f1)
+		extract_fileid(f2)
 
 print("%d file ids" % len(fileid_list))
 
