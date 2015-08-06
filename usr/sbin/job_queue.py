@@ -31,7 +31,7 @@ class JobQueue(object):
     def __init__(self, num_uploaders, appid, bucket, secret_id, secret_key, message_queue, pid_log):
         self.ready_queue = []
         self.ready_queue_index = 0
-        self.queue = multiprocessing.Queue(200)
+        self.queue = multiprocessing.Queue()
         self.slave_processes = []
         pid_log_lock = multiprocessing.Lock()
         for i in range(num_uploaders):
