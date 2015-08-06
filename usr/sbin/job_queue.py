@@ -19,12 +19,19 @@ import urllib
 import signal
 import os
 
+# debug
+import logging
+mpl = multiprocessing.log_to_stderr()
+mpl.setLevel(logging.INFO)
+
 from uploader import Uploader
 
 class JobQueue(object):
     # number of uploaders
     def __init__(self, num_uploaders, appid, bucket, secret_id, secret_key, message_queue, pid_log):
-        self.queue = multiprocessing.Queue()
+        self.ready_queue = []
+        self.ready_queue_index = 0
+        self.queue = multiprocessing.Queue(200)
         self.slave_processes = []
         pid_log_lock = multiprocessing.Lock()
         for i in range(num_uploaders):
@@ -43,11 +50,21 @@ class JobQueue(object):
     #           1 -- binary data in memory 
     #           2 -- url
     def inqueue(self, job_type, job_obj, job_fileid):
-        self.queue.put((job_type, job_obj, job_fileid))
+        self.ready_queue.append((job_type, job_obj, job_fileid))
+
+    # this function must be called when queue is empty
+    def fill_queue(self):
+        while self.ready_queue_index < len(self.ready_queue):
+            try:
+                self.queue.put_nowait(self.ready_queue[self.ready_queue_index])
+                self.ready_queue_index += 1
+                fill_count += 1
+            except Queue.Full:
+                break
 
     def inqueue_finish_flags(self):
         for _ in range(len(self.slave_processes)):
-            self.queue.put("Finished")
+            self.ready_queue.append("Finished")
     
     # delete all jobs already submited, wait until all subprocesses quit
     def stop(self):
@@ -58,7 +75,10 @@ class JobQueue(object):
             except Queue.Empty:
                 break
         
+        # ignore jobs in ready_queue
+        self.ready_queue_index = len(self.ready_queue)
         self.inqueue_finish_flags()
+        self.fill_queue()
         self.finish()
 
     # block until all child processes end

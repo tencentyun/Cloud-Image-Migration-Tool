@@ -145,6 +145,7 @@ if __name__ == "__main__":
 
         # receive message from child processes, write to log
         while True:
+            job_queue.fill_queue()
             message = message_queue.get()
             
             # success
