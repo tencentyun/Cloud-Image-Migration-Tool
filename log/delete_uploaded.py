@@ -38,7 +38,10 @@ def extract_fileid(f):
             #image_obj.delete(bucket, fileid)
 
 def do_delete(fileid):
-    image_obj.delete(bucket, fileid) 
+    try:
+        image_obj.delete(bucket, fileid) 
+    except Exception:
+        pass
 
 with open("stderr") as f1, open("stdout") as f2:
     extract_fileid(f1)
