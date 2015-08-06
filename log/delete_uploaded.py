@@ -30,7 +30,8 @@ fileid_list = []
 
 def extract_fileid(f):
     for line in f:
-        match_result = re.match("^.*file id == ([^,]+),.*$", line)
+        match_result = re.match("^.*file id == ([^,\n]+),?.*$", line)
+        #print(match_result.groups()[0])
         if match_result and len(match_result.groups()):
             fileid = match_result.groups()[0]
             fileid_list.append(fileid)
