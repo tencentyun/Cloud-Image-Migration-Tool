@@ -46,7 +46,7 @@ def traverse(config, log_path, job_queue, skip):
     # treverse list
     with open(urllist_root_path) as f:
         for url in f:
-            fileid = urlparse.urlparse(url).path
+            fileid = urlparse.urlparse(url[: -1]).path
             if len(fileid) and fileid[0] == '/':
                 fileid = fileid[1: ]
 
