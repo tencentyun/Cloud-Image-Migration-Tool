@@ -58,7 +58,6 @@ class JobQueue(object):
             try:
                 self.queue.put_nowait(self.ready_queue[self.ready_queue_index])
                 self.ready_queue_index += 1
-                fill_count += 1
             except Queue.Full:
                 break
 
