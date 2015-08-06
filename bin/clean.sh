@@ -26,3 +26,4 @@ LOG_PATH=$(get_abs_path $LOG_PATH)
 rm -f ${LOG_PATH}/pid
 rm -f ${LOG_PATH}/stderr
 rm -f ${LOG_PATH}/stdout
+rm -f ${LOG_PATH}/state
