@@ -20,9 +20,9 @@ import signal
 import os
 
 # debug
-import logging
-mpl = multiprocessing.log_to_stderr()
-mpl.setLevel(logging.INFO)
+#import logging
+#mpl = multiprocessing.log_to_stderr()
+#mpl.setLevel(logging.INFO)
 
 from uploader import Uploader
 
