@@ -90,6 +90,11 @@ if __name__ == "__main__":
             print("Error: Option", section + "." + option, "is required. ")
             exit(1)
 
+    if config["toolconfig"]["concurrency"] <= 0:
+        print("Error: Minimum of toolconfig.cocurrency is 1. ")
+        exit(1)
+
+
 
     traverse_functions = [ 
                            traverse_dir.traverse,
