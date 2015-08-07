@@ -19,13 +19,7 @@ def traverse(config, log_path, job_queue, skip):
     import urlparse
 
     mandatory_options = [ 
-                          ("migrateinfo", "migrate.type"),
                           ("urllist", "url.url_list_file_path"),
-                          ("appinfo", "appinfo.appid"), 
-                          ("appinfo", "appinfo.secretid"),
-                          ("appinfo", "appinfo.secretkey"),
-                          ("appinfo", "appinfo.bucket"),
-                          ("toolconfig", "concurrency"),
                         ] 
 
     for section, option in mandatory_options:

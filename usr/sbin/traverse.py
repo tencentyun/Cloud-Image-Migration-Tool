@@ -55,8 +55,6 @@ if __name__ == "__main__":
         print("Error: Log path", log_path, "is not directory or not exists. ")
         exit(1)
     
-    #log_files = [ "stdout", "stderr", "pid" ]
-    #log_files = [ os.path.join(log_path, x) for x in log_files ] 
 
     skip = set()
     if os.path.exists(os.path.join(log_path, "stdout")):
@@ -67,12 +65,6 @@ if __name__ == "__main__":
                     fileid = match_result.groups()[0]
                     skip.add(fileid)
 
-    '''
-    for log_file in log_files:
-        if os.path.exists(log_file):
-            print("Error:", log_file, "alreadty exists. ")
-            exit(1)
-    '''
 
 
     # non-builtin modules mustn't be loaded before this statement
@@ -84,11 +76,20 @@ if __name__ == "__main__":
 
     # print(config)
 
-    migrate_type = ("migrateinfo", "migrate.type")
+    mandatory_options = [ 
+                          ("migrateinfo", "migrate.type"),
+                          ("appinfo", "appinfo.appid"), 
+                          ("appinfo", "appinfo.secretid"),
+                          ("appinfo", "appinfo.secretkey"),
+                          ("appinfo", "appinfo.bucket"),
+                          ("toolconfig", "concurrency"),
+                        ] 
 
-    if migrate_type[0] not in config or migrate_type[1] not in config[migrate_type[0]]:
-        print("Error: Option", migrate_type[0] + "." + migrate_type[1], "is required. ")
-        exit(1)
+    for section, option in mandatory_options:
+        if section not in config or option not in config[section]:
+            print("Error: Option", section + "." + option, "is required. ")
+            exit(1)
+
 
     traverse_functions = [ 
                            traverse_dir.traverse,
@@ -128,7 +129,7 @@ if __name__ == "__main__":
          
         # traverse dir OR traver urllist OR other methods
         num_submited, num_skipped = \
-            traverse_functions[int(config[migrate_type[0]][migrate_type[1]]) - 1](config, log_path, job_queue, skip)
+            traverse_functions[int(config["migrateinfo"]["migrate.type"]) - 1](config, log_path, job_queue, skip)
         num_failed, num_successful = 0, num_skipped
 
         # Queue is FIFO, so put finish flags after all jobs

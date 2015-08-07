@@ -19,13 +19,7 @@ import os
 def traverse(config, log_path, job_queue, skip):
     # check config
     mandatory_options = [ 
-                          ("migrateinfo", "migrate.type"),
                           ("local", "local.image_root_path"), 
-                          ("appinfo", "appinfo.appid"), 
-                          ("appinfo", "appinfo.secretid"),
-                          ("appinfo", "appinfo.secretkey"),
-                          ("appinfo", "appinfo.bucket"),
-                          ("toolconfig", "concurrency"),
                         ] 
 
     for section, option in mandatory_options:
