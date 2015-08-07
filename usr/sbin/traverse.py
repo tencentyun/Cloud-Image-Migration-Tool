@@ -90,7 +90,7 @@ if __name__ == "__main__":
             print("Error: Option", section + "." + option, "is required. ")
             exit(1)
 
-    if config["toolconfig"]["concurrency"] <= 0:
+    if not config["toolconfig"]["concurrency"].isdigit() or int(config["toolconfig"]["concurrency"]) <= 0:
         print("Error: Minimum of toolconfig.cocurrency is 1. ")
         exit(1)
 
