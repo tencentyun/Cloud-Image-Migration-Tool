@@ -78,7 +78,7 @@ class JobQueue(object):
                 job_num += 1
             except Queue.Empty:
                 break
-        print("delete %d undone jobs" % job_num)
+        print("delete %d undone jobs" % (job_num + len(self.ready_queue) - self.ready_queue_index))
 
         # ignore jobs in ready_queue
         self.ready_queue_index = len(self.ready_queue)
