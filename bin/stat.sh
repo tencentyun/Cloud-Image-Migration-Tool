@@ -18,6 +18,7 @@ LOG_PATH="../log/"
 
 function get_abs_path() {
     (
+    cd $(dirname $0)
     cd $(dirname $1)
     echo $PWD/$(basename $1)
     )
