@@ -24,7 +24,7 @@ import Queue
 import config_load
 import traverse_dir 
 import traverse_urllist 
-
+import traverse_qiniu
 
 # command line arguments: lib_path conf_path log path
 if __name__ == "__main__":
@@ -99,6 +99,7 @@ if __name__ == "__main__":
     traverse_functions = [ 
                            traverse_dir.traverse,
                            traverse_urllist.traverse,
+                           traverse_qiniu.traverse,
                            # other traverse methods
                          ]
 
