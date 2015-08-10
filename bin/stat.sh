@@ -11,7 +11,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Aug  6, 2015
  #  Time: 10:31:47
- #  Description: 
+ #  Description: show status
 ###############################################################################
 
 LOG_PATH="../log/"
