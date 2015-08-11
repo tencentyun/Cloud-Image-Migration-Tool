@@ -17,6 +17,10 @@ import os
 import sys
 import urlparse
 
+# TODO: support non-ascii chars
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
+
 def traverse(config, log_path, job_queue, skip):
     import qiniu
 
@@ -28,6 +32,8 @@ def traverse(config, log_path, job_queue, skip):
                           ("qiniu", "qiniu.domain"),
                           ("qiniu", "qiniu.start_offset"),
                           ("qiniu", "qiniu.total_num"),
+                          ("qiniu", "qiniu.referer"),
+                          ("qiniu", "qiniu.isprivate"),
                         ] 
 
     for section, option in mandatory_options:
@@ -43,6 +49,13 @@ def traverse(config, log_path, job_queue, skip):
     offset = int(offset) if len(offset) else 0
     num = config["qiniu"]["qiniu.total_num"]
     num = int(num) if len(num) else sys.maxint
+    referer = config["qiniu"]["qiniu.referer"]
+    referer = referer if len(referer) else None
+    is_private = config["qiniu"]["qiniu.isprivate"]
+    is_private = True if is_private == "1" or is_private.lower() == "true" else False
+
+    print("referer ==", referer)
+    print("is private ==", is_private)
 
 
     # number of submited = totoal
@@ -69,7 +82,15 @@ def traverse(config, log_path, job_queue, skip):
             for item in ret["items"]:
                 if count >= offset and count < offset + num:
                     fileid = item["key"]
+                    
+                    if not is_ascii(fileid):
+                        print("fileid ", fileid, "is not ascii, skip")
+                        continue
+
                     url = urlparse.urljoin(domain, fileid)
+                    
+                    if is_private:
+                        url = qn.private_download_url(url, expires = 3600 * 24 * 365)
 
                     if fileid not in skip:
                         job_queue.inqueue(2, url, fileid)
