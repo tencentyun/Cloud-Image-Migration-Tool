@@ -55,8 +55,6 @@ def traverse(config, log_path, job_queue, skip):
     is_private = config["qiniu"]["qiniu.isprivate"]
     is_private = True if is_private == "1" or is_private.lower() == "true" else False
 
-    print("referer ==", referer)
-    print("is private ==", is_private)
 
 
     # number of submited = totoal
