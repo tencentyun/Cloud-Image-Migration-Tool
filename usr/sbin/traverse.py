@@ -157,28 +157,28 @@ if __name__ == "__main__":
             
             # success
             if message[0] == 0:
-                stdout.write("%s: %s\n" % (time.asctime(), message[1]))
+                stdout.write(("%s: %s\n" % (time.asctime(), message[1])).encode("utf-8"))
                 num_successful += 1
             # failure
             elif message[0] == 1:
-                stderr.write("%s: %s\n" % (time.asctime(), message[1]))
+                stderr.write(("%s: %s\n" % (time.asctime(), message[1])).encode("utf-8"))
                 num_failed += 1
             # job finish
             elif message[0] == 2:
                 num_finished += 1
-                stdout.write("%s: %d of %d processes finished \n" % (time.asctime(), num_finished, num_processes))
+                stdout.write(("%s: %d of %d processes finished \n" % (time.asctime(), num_finished, num_processes)).encode("utf-8"))
                 if num_finished == num_processes:
-                    state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                    state.write(("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited)).encode("utf-8"))
                     state.flush()
                     break
 
             if time.time() - state_flush_time > state_flush_interval:
-                state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                state.write(("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited)).encode("utf-8"))
                 state.flush()
                 state_flush_time = time.time()
 
         job_queue.finish()
-        stdout.write("%s: master process finished \n" % time.asctime())
+        stdout.write(("%s: master process finished \n" % time.asctime()).encode("utf-8"))
     except KeyboardInterrupt:
         if "job_queue" in locals():
             job_queue.stop()
@@ -190,29 +190,29 @@ if __name__ == "__main__":
                     
                     # success
                     if message[0] == 0 and "stdout" in locals():
-                        stdout.write("%s: %s\n" % (time.asctime(), message[1]))
+                        stdout.write(("%s: %s\n" % (time.asctime(), message[1])).encode("utf-8"))
                         num_successful += 1
                     # failure
                     elif message[0] == 1 and "stderr" in locals():
-                        stderr.write("%s: %s\n" % (time.asctime(), message[1]))
+                        stderr.write(("%s: %s\n" % (time.asctime(), message[1])).encode("utf-8"))
                         num_failed += 1
                     # job finish
                     elif message[0] == 2 and "stdout" in locals():
                         num_finished += 1
-                        stdout.write("%s: %d of %d processes interrupted \n" % (time.asctime(), num_finished, num_processes))
+                        stdout.write(("%s: %d of %d processes interrupted \n" % (time.asctime(), num_finished, num_processes)).encode("utf-8"))
                     
                     if "state" in locals() and time.time() - state_flush_time > state_flush_interval:
-                        state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                        state.write(("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited)).encode("utf-8"))
                         state.flush()
                         state_flush_time = time.time()
 
                 except Queue.Empty:
                     if "state" in locals():
-                        state.write("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited))
+                        state.write(("failed, successful / submited: %d, %d / %d\n" % (num_failed, num_successful, num_submited)).encode("utf-8"))
                         state.flush()
                     break
             if "stdout" in locals():
-                stdout.write("%s: master process interrupted \n" % time.asctime())
+                stdout.write(("%s: master process interrupted \n" % time.asctime()).encode("utf-8"))
     finally:
         if "pid_file" in locals():
             pid_file.close()
