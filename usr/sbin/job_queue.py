@@ -16,6 +16,7 @@ import Queue
 import multiprocessing
 import requests
 import urllib
+import urllib2
 import signal
 import os
 
@@ -118,6 +119,13 @@ class JobQueue(object):
                     #with open("/Users/jamis/Desktop/url/" + job[2].replace("/", "%2f"), "wb") as f:
                     #    f.write(bin_image)
                     return_obj = slave.upload_binary(bin_image, job[2])
+                elif job[0] == 3:
+                    req = urllib2.Request(job[1][0])
+                    req.add_header("Referer", job[1][1])
+                    bin_image = urllib2.urlopen(req).read()
+                    
+                    return_obj = slave.upload_binary(bin_image, job[2])
+
                 message_queue.put(return_obj)
             except Exception as e:
                 message_queue.put((1, "file id == " + job[2] + ", exception: " + str(e)))
