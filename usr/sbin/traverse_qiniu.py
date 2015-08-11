@@ -93,8 +93,10 @@ def traverse(config, log_path, job_queue, skip):
                         url = qn.private_download_url(url, expires = 3600 * 24 * 365)
 
                     if fileid not in skip:
-                        job_queue.inqueue(2, url, fileid)
-                        #print(fileid, url)
+                        if referer:
+                            job_queue.inqueue(3, (url, referer), fileid)
+                        else:
+                            job_queue.inqueue(2, url, fileid)
                     else:
                         num_skipped += 1
                     num_submited += 1
