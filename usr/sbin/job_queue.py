@@ -116,8 +116,6 @@ class JobQueue(object):
                     return_obj = slave.upload_binary(job[1], job[2])
                 elif job[0] == 2:
                     bin_image = urllib.urlopen(job[1]).read()
-                    #with open("/Users/jamis/Desktop/url/" + job[2].replace("/", "%2f"), "wb") as f:
-                    #    f.write(bin_image)
                     return_obj = slave.upload_binary(bin_image, job[2])
                 elif job[0] == 3:
                     req = urllib2.Request(job[1][0])
