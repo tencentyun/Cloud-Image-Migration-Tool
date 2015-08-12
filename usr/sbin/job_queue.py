@@ -17,6 +17,7 @@ import multiprocessing
 import requests
 import urllib
 import urllib2
+import requests
 import signal
 import os
 
@@ -116,17 +117,28 @@ class JobQueue(object):
                     return_obj = slave.upload_binary(job[1], job[2])
                 elif job[0] == 2:
                     filehandle = urllib.urlopen(job[1])
+
                     if 100 <= filehandle.getcode() < 300:
                         bin_image = filehandle.read()
                         return_obj = slave.upload_binary(bin_image, job[2])
                     else:
                         return_obj = (1, "file id == %s, http return code %d when downloading. " % (job[2], filehandle.getcode()))
                 elif job[0] == 3:
+                    filehandle = requests.get(job[1][0], headers = { "referer": job[1][1] }, stream = True)
+
+                    if 100 <= filehandle.status_code < 300:
+                        bin_image = filehandle.raw.read()
+                        return_obj = slave.upload_binary(bin_image, job[2])
+                    else:
+                        return_obj = (1, "file id == %s, http return code %d when downloading. " % (job[2], filehandle.getcode()))
+
+                    '''
                     req = urllib2.Request(job[1][0])
                     req.add_header("Referer", job[1][1])
                     bin_image = urllib2.urlopen(req).read()
-                    
+
                     return_obj = slave.upload_binary(bin_image, job[2])
+                    '''
 
                 message_queue.put(return_obj)
             except Exception as e:

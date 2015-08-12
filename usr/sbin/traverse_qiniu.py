@@ -86,7 +86,8 @@ def traverse(config, log_path, job_queue, skip):
                         print("fileid ", fileid, "is not ascii, skip")
                         continue
 
-                    url = urlparse.urljoin(domain, urllib.quote(fileid))
+                    #url = urlparse.urljoin(domain, urllib.quote(fileid))
+                    url = urlparse.urljoin(domain, fileid)
                     
                     if is_private:
                         url = qn.private_download_url(url, expires = 3600 * 24 * 365)
