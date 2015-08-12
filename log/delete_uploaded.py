@@ -39,7 +39,7 @@ def extract_fileid(f):
 
 def do_delete(fileid):
     try:
-        image_obj.delete(bucket, fileid) 
+        print(image_obj.delete(bucket, fileid)["message"])
     except Exception:
         pass
 
