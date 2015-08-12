@@ -31,14 +31,14 @@ class Uploader(object):
         if "code" in response_obj and response_obj["code"] == 0:
             return (0, "file id == " + fileid)
         else:
-            return (1, "file id == " + fileid + ", response packet == " + str(response_obj))
+            return (1, "file id == %s, response packet == message: %s, code: %d, httpcode: %d" % (fileid, response_obj["message"].decode("utf-8"), response_obj["code"], response_obj["httpcode"]))
         
 
     def upload_binary(self, binary, fileid):
         response_obj = self.image_obj.upload_binary(binary, self.bucket, fileid)
-
+        
         if "code" in response_obj and response_obj["code"] == 0:
             return (0, "file id == " + fileid)
         else:
-            return (1, "file id == " + fileid + ", response packet == " + str(response_obj))
+            return (1, "file id == %s, response packet == message: %s, code: %d, httpcode: %d" % (fileid, response_obj["message"].decode("utf-8"), response_obj["code"], response_obj["httpcode"]))
         
