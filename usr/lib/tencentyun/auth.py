@@ -27,11 +27,15 @@ class Auth(object):
             expired: expire time
             userid: user id, pls ignore or set to '0'
         """
+        
+        if isinstance(fileid, unicode):
+            fileid = fileid.encode("utf-8")
+
         if not self._secret_id or not self._secret_key:
             return self.AUTH_SECRET_ID_KEY_ERROR
 
         app_info = conf.get_app_info()
-        appid   = app_info['appid']
+        appid = app_info['appid']
 
         puserid = ''
         if userid != '':
@@ -42,10 +46,11 @@ class Auth(object):
         now = int(time.time())
         rdm = random.randint(0, 999999999)
         plain_text = 'a=' + appid + '&b=' + bucket +'&k=' + self._secret_id + '&e=' + str(expired) + '&t=' + str(now) + '&r=' + str(rdm) + '&u=' + puserid + '&f=' + fileid
+        
         bin = hmac.new(self._secret_key, plain_text, hashlib.sha1)
         s = bin.hexdigest()
         s = binascii.unhexlify(s)
-        s = s + plain_text.encode('ascii')
+        s = s + plain_text
         signature = base64.b64encode(s).rstrip()    #生成签名
         return signature
 

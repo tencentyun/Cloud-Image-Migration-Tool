@@ -19,6 +19,9 @@ class ImageV2(object):
         conf.set_app_info(appid, secret_id, secret_key)
 
     def upload(self, filepath, bucket, fileid = '', userid = '0', magic_context = '', params = {}):
+        if isinstance(fileid, unicode):
+            fileid = fileid.encode('utf-8')
+
         filepath = os.path.abspath(filepath);
         if not os.path.exists(filepath):
             return {'httpcode':0, 'code':self.IMAGE_FILE_NOT_EXISTS, 'message':'file not exists', 'data':{}}
@@ -44,7 +47,7 @@ class ImageV2(object):
         }
 
         if filetype == 0:
-            files = {'FileContent': open(fileobj, 'rb')}
+            files = {'FileContent': open(fileobj.decode("utf-8"), 'rb')}
         elif filetype == 1:
             files = { 'FileContent': fileobj }
 
@@ -93,6 +96,9 @@ class ImageV2(object):
     def stat(self, bucket, fileid, userid='0'):
         if not fileid:
             return {'httpcode':0, 'code':self.IMAGE_PARAMS_ERROR, 'message':'params error', 'data':{}}
+
+        if isinstance(fileid, unicode):
+            fileid = fileid.encode('utf-8')
 
         expired = int(time.time()) + self.EXPIRED_SECONDS
         url = self.generate_res_url_v2(bucket, userid, fileid)
@@ -144,6 +150,9 @@ class ImageV2(object):
         if not fileid:
             return {'httpcode':0, 'code':self.IMAGE_PARAMS_ERROR, 'message':'params error', 'data':{}}
 
+        if isinstance(fileid, unicode):
+            fileid = fileid.encode('utf-8')
+
         expired = 0
         url = self.generate_res_url_v2(bucket, userid, fileid, 'copy')
         auth = Auth(self._secret_id, self._secret_key)
@@ -189,6 +198,9 @@ class ImageV2(object):
     def delete(self, bucket, fileid, userid='0'):
         if not fileid:
             return {'httpcode':0, 'code':self.IMAGE_PARAMS_ERROR, 'message':'params error', 'data':{}}
+
+        if isinstance(fileid, unicode):
+            fileid = fileid.encode('utf-8')
 
         expired = 0
         url = self.generate_res_url_v2(bucket, userid, fileid, 'del')
