@@ -115,8 +115,12 @@ class JobQueue(object):
                 elif job[0] == 1:
                     return_obj = slave.upload_binary(job[1], job[2])
                 elif job[0] == 2:
-                    bin_image = urllib.urlopen(job[1]).read()
-                    return_obj = slave.upload_binary(bin_image, job[2])
+                    filehandle = urllib.urlopen(job[1])
+                    if 100 <= filehandle.getcode() < 300:
+                        bin_image = filehandle.read()
+                        return_obj = slave.upload_binary(bin_image, job[2])
+                    else:
+                        return_obj = (1, "file id == %s, http return code %d when downloading. " % (job[2], filehandle.getcode()))
                 elif job[0] == 3:
                     req = urllib2.Request(job[1][0])
                     req.add_header("Referer", job[1][1])
@@ -126,7 +130,7 @@ class JobQueue(object):
 
                 message_queue.put(return_obj)
             except Exception as e:
-                message_queue.put((1, "file id == " + job[2] + ", exception: " + str(e)))
+                message_queue.put((1, "file id == %s, exception: %s" % (job[2], str(e))))
             
 
     
