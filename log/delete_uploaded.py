@@ -18,11 +18,11 @@ import sys
 sys.path.insert(0, "../usr/lib/")
 import tencentyun
 
-appid = '10000037'
-secret_id = 'AKIDpoKBfMK7aYcYNlqxnEtYA1ajAqji2P7T'
-secret_key = 'P4FewbltIpGeAbwgdrG6eghMUVlpmjIe'
+appid = '10001818'
+secret_id = 'AKID1Q25kCKsgs5ZTlGsdzXi0z394LptiQQS'
+secret_key = 'tQSzSEj6hvc1e43X5ejExIuG9lihGcdR'
 
-bucket = 'test0706'
+bucket = 'citest'
 
 image_obj = tencentyun.ImageV2(appid,secret_id,secret_key)
 
