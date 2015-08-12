@@ -11,17 +11,8 @@
  #  Description: stop
 ###############################################################################
 
-LOG_PATH="../log/"
+. $(dirname $0)/env.sh
 
-function get_abs_path() {
-    (
-    cd $(dirname $0)
-    cd $(dirname $1)
-    echo $PWD/$(basename $1)
-    )
-}
-
-LOG_PATH=$(get_abs_path $LOG_PATH)
 
 master_pid=$(head -n 1 ${LOG_PATH}/pid 2> /dev/null)
 pids=$(cat ${LOG_PATH}/pid 2> /dev/null)

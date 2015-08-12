@@ -11,18 +11,7 @@
  #  Description: clean logs
 ###############################################################################
 
-LOG_PATH="../log/"
-
-function get_abs_path() {
-    (
-    cd $(dirname $0)
-    cd $(dirname $1)
-    echo $PWD/$(basename $1)
-    )
-}
-
-LOG_PATH=$(get_abs_path $LOG_PATH)
-
+. $(dirname $0)/env.sh
 
 rm -f ${LOG_PATH}/pid
 rm -f ${LOG_PATH}/stderr

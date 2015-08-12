@@ -14,16 +14,6 @@
  #  Description: show status
 ###############################################################################
 
-LOG_PATH="../log/"
-
-function get_abs_path() {
-    (
-    cd $(dirname $0)
-    cd $(dirname $1)
-    echo $PWD/$(basename $1)
-    )
-}
-
-LOG_PATH=$(get_abs_path $LOG_PATH)
+. $(dirname $0)/env.sh
 
 tail -f ${LOG_PATH}/state
