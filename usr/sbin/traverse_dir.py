@@ -44,7 +44,7 @@ def traverse(config, log_path, job_queue, skip):
     num_submited = 0
     num_skipped = 0
     # traverse dir and submit job to job queue
-    for dirpath, dirs, files in os.walk(image_root_path):
+    for dirpath, dirs, files in os.walk(image_root_path, followlinks = True):
         for filename in files:
             if filename_pattern and not filename_pattern.match(filename):
                 continue
