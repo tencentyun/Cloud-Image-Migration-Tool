@@ -15,8 +15,9 @@ from __future__ import print_function
 from multiprocessing import Queue
 
 import os
+import re
 
-def traverse(config, job_queue, skip):
+def traverse(config, job_queue, skip, (fileid_format_pattern, fileid_format_replace)):
     import urlparse
 
     mandatory_options = [ 
@@ -51,6 +52,9 @@ def traverse(config, job_queue, skip):
             fileid = urlparse.urlparse(url).path
             if len(fileid) and fileid[0] == '/':
                 fileid = fileid[1: ]
+
+            if fileid_format_pattern and fileid_format_replace:
+                fileid = re.sub(fileid_format_pattern, fileid_format_replace, fileid)
 
             num_submited += 1
             if fileid not in skip:

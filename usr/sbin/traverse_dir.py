@@ -16,7 +16,7 @@ import re
 import os
 
 
-def traverse(config, job_queue, skip):
+def traverse(config, job_queue, skip, (fileid_format_pattern, fileid_format_replace)):
     # check config
     mandatory_options = [ 
                           ("local", "local.image_root_path"), 
@@ -50,6 +50,9 @@ def traverse(config, job_queue, skip):
                 continue
             full_name = os.path.join(dirpath, filename)
             fileid = full_name[len(image_root_path) + 1: ]
+            
+            if fileid_format_pattern and fileid_format_replace:
+                fileid = re.sub(fileid_format_pattern, fileid_format_replace, fileid)
 
             num_submited += 1
             if fileid not in skip:

@@ -22,7 +22,7 @@ import urllib
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
 
-def traverse(config, job_queue, skip):
+def traverse(config, job_queue, skip, (fileid_format_pattern, fileid_format_replace)):
     import qiniu
 
     # check config
@@ -87,6 +87,9 @@ def traverse(config, job_queue, skip):
                     
                     if is_private:
                         url = qn.private_download_url(url, expires = 3600 * 24 * 365)
+
+                    if fileid_format_pattern and fileid_format_replace:
+                        fileid = re.sub(fileid_format_pattern, fileid_format_replace, fileid)
 
                     if fileid not in skip:
                         if referer:

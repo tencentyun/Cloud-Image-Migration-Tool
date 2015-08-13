@@ -94,6 +94,13 @@ if __name__ == "__main__":
         print("Error: Minimum of toolconfig.cocurrency is 1. ")
         exit(1)
 
+    # advanced options: format fileid
+    if "advanced" in config and "sub.pattern" in config["advanced"] and "sub.replace" in config["advanced"]:
+        fileid_format_pattern = config["advanced"]["sub.pattern"]
+        fileid_format_replace = config["advanced"]["sub.replace"]
+    else:
+        fileid_format_pattern = None
+        fileid_format_replace = None
 
 
     traverse_functions = [ 
@@ -135,7 +142,7 @@ if __name__ == "__main__":
          
         # traverse dir OR traver urllist OR other methods
         num_submited, num_skipped = \
-            traverse_functions[int(config["migrateinfo"]["migrate.type"]) - 1](config, log_path, job_queue, skip)
+            traverse_functions[int(config["migrateinfo"]["migrate.type"]) - 1](config, job_queue, skip, (fileid_format_pattern, fileid_format_replace))
         num_failed, num_successful = 0, num_skipped
 
         # Queue is FIFO, so put finish flags after all jobs
