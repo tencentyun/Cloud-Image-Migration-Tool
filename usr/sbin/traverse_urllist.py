@@ -11,6 +11,7 @@
  #  Description: traverse a file consisting of URLs
 ###############################################################################
 
+from __future__ import print_function
 from multiprocessing import Queue
 
 import os
@@ -28,7 +29,11 @@ def traverse(config, log_path, job_queue, skip):
             exit(1)
 
     if not os.path.isabs(config["urllist"]["url.url_list_file_path"]):
-        print("Error: URL list file path", config["urllist"]["url.url_list_file_path"], "is not absolute path")
+        print("Error: URL list file path", config["urllist"]["url.url_list_file_path"], "is not absolute path. ")
+        exit(1)
+
+    if not os.path.isfile(config["urllist"]["url.url_list_file_path"]):
+        print("Error: URL list file path", config["urllist"]["url.url_list_file_path"], "does not exist. ")
         exit(1)
 
     urllist_root_path = os.path.abspath(os.path.expanduser(config["urllist"]["url.url_list_file_path"]))
