@@ -80,12 +80,8 @@ def traverse(config, log_path, job_queue, skip):
 
             for item in ret["items"]:
                 if count >= offset and count < offset + num:
-                    fileid = item["key"]
+                    fileid = item["key"].encode("utf-8")
                     
-                    if not is_ascii(fileid):
-                        print("fileid ", fileid, "is not ascii, skip")
-                        continue
-
                     #url = urlparse.urljoin(domain, urllib.quote(fileid))
                     url = urlparse.urljoin(domain, fileid)
                     
