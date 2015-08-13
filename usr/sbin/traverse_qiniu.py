@@ -22,7 +22,7 @@ import urllib
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
 
-def traverse(config, log_path, job_queue, skip):
+def traverse(config, job_queue, skip):
     import qiniu
 
     # check config

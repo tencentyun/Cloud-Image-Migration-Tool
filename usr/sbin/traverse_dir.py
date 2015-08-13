@@ -16,7 +16,7 @@ import re
 import os
 
 
-def traverse(config, log_path, job_queue, skip):
+def traverse(config, job_queue, skip):
     # check config
     mandatory_options = [ 
                           ("local", "local.image_root_path"), 

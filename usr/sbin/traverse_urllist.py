@@ -16,7 +16,7 @@ from multiprocessing import Queue
 
 import os
 
-def traverse(config, log_path, job_queue, skip):
+def traverse(config, job_queue, skip):
     import urlparse
 
     mandatory_options = [ 
