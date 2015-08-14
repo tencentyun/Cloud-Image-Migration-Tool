@@ -192,7 +192,9 @@ if __name__ == "__main__":
 
             while True:
                 try:
-                    # TODO
+                    # Only master process retrieve message from message queue.
+                    # When running in this loop, all child processes have already quit
+                    # so there won't be any new messages put in this queue
                     message = message_queue.get_nowait()
                     
                     # success
