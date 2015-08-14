@@ -18,10 +18,6 @@ import sys
 import urlparse
 import urllib
 
-# TODO: support non-ascii chars
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
 def traverse(config, job_queue, skip, (fileid_format_pattern, fileid_format_replace)):
     import qiniu
 
