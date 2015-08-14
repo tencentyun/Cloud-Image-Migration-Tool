@@ -138,7 +138,6 @@ if __name__ == "__main__":
                              write_pid_log,
                             )
         
-        pid_file.close()
          
         # traverse dir OR traver urllist OR other methods
         num_submited, num_skipped = \
@@ -193,6 +192,7 @@ if __name__ == "__main__":
 
             while True:
                 try:
+                    # TODO
                     message = message_queue.get_nowait()
                     
                     # success
