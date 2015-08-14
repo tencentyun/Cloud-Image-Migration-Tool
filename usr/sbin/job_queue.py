@@ -116,6 +116,7 @@ class JobQueue(object):
                 elif job[0] == 1:
                     return_obj = slave.upload_binary(job[1], job[2])
                 elif job[0] == 2:
+                    # TODO: what if redirect?
                     filehandle = urllib.urlopen(job[1])
 
                     if 100 <= filehandle.getcode() < 300:
