@@ -110,4 +110,4 @@ Concurrency = 100
 3. [Qiniu Resource Storage SDK for Python](https://github.com/qiniu/python-sdk)
 
 ##许可
-基于MIT开源协议发布，详见[LICENSE](https://github.com/JamisHoo/Transfer-Tools/blob/master/LICENSE)。
+基于MIT开源协议发布，详见[LICENSE](LICENSE)。
