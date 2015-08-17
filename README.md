@@ -7,7 +7,7 @@
 
 2. 指定URL列表文件，文件中包含若干张图片的URL。下载列表文件中的每一张图片并上传到万象优图。
 
-3. 指定七牛云存储的账号和空间名，迁移该指定空间中得所有文件或部分文件到万象优图。
+3. 指定七牛云存储的账号和空间名，迁移该指定空间中的所有文件或部分文件到万象优图。
 
 ##使用方法
 
@@ -64,9 +64,10 @@ url.url_list_file_path = /data/url_list
 
 若迁移类型为3，则需要配置七牛云存储账号相关信息。
 
-其中被迁移的空间名；`qiniu.domain`为七牛域名，需要包含协议类型（如http://）；若只迁移一部分则需要提供`qiniu.start_offset`和`qiniu.total_num`，`qiniu.start_offset`从0计；若空间开启了防盗链，需要在`qiniu.referer`中指定访问来源域名，同样需要包含协议类型（如http://）；如果是私有空间，将`qiniu.isprivate`设置为`1`或`True`。
+`qiniu.bucket`填写被迁移的空间名；`qiniu.domain`为七牛域名，需要包含协议类型（如http://）；若只迁移一部分则需要提供`qiniu.start_offset`和`qiniu.total_num`，`qiniu.start_offset`从0计；若空间开启了防盗链，需要在`qiniu.referer`中指定访问来源域名，同样需要包含协议类型（如http://）；如果是私有空间，将`qiniu.isprivate`设置为`1`或`True`。
 
 ```
+[Qiniu]
 qiniu.bucket = 
 qiniu.AccessKey = 
 qiniu.SecretKey = 
@@ -78,9 +79,35 @@ qiniu.isprivate =
 ```
 
 ###万象优图账号信息
-TODO
+
+从[万象优图图片空间](http://console.qcloud.com/image/bucket)中查看项目ID和空间名称，分别填写到`appinfo.appid`和`appinfo.bucket`；从[万象优图项目设置](http://console.qcloud.com/image/project)中查看Secret ID和Secret Key分别填写到`appinfo.secretID`和`appinfo.secretKey`。
+
+```
+[AppInfo]
+appinfo.appid = 
+appinfo.secretID = 
+appinfo.secretKey = 
+appinfo.bucket = 
+```
 
 ###并行上传
 
-TODO
+`Concurrency`控制同时运行的上传进程数目，请根据上行带宽和机器配置适当调整该数值。必须提供一个大于0的整数。
 
+```
+[ToolConfig]
+Concurrency = 100
+```
+
+##致谢
+
+本工具包含了以下开源项目
+
+1. [Requests: HTTP for Humans](http://www.python-requests.org/en/latest/)
+
+2. [Cloud Image Python 2 SDK](https://github.com/tencentyun/python-sdk)
+
+3. [Qiniu Resource Storage SDK for Python](https://github.com/qiniu/python-sdk)
+
+##许可
+基于MIT开源协议发布，详见[LICENSE](https://github.com/JamisHoo/Transfer-Tools/blob/master/LICENSE)。
