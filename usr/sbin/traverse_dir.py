@@ -32,9 +32,9 @@ def traverse(config, job_queue, skip, (fileid_format_pattern, fileid_format_repl
         exit(1)
     
     # only filenames matching this regex will be uploaded, others would be ignored
-    filename_pattern = re.compile(".*\.(?:jpg|jpeg|png|gif|bmp|webp)$", re.IGNORECASE)
+    #filename_pattern = re.compile(".*\.(?:jpg|jpeg|png|gif|bmp|webp)$", re.IGNORECASE)
     # use this to match all filenames
-    # filename_pattern = None
+    filename_pattern = None
 
     
     image_root_path = os.path.abspath(os.path.expanduser(config["local"]["local.image_root_path"]))
