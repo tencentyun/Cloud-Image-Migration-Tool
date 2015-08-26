@@ -92,3 +92,7 @@ if __name__ == "__main__":
         (job_manager, process_manager) = check_result
 
     job_manager.do()
+    
+    print("New submitted: %d" % job_manager.new_submitted)
+    print("Submit failed: %d" % job_manager.submit_error)
+    
