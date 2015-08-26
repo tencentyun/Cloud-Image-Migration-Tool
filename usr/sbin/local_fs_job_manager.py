@@ -2,11 +2,11 @@
 
 from __future__ import print_function
 
-from job_manager import JobManager
+from base_job_manager import BaseJobManager
 
 import os
 
-class LocalFSJobManager(JobManager):
+class LocalFSJobManager(BaseJobManager):
 
     mandatory_options = [
         ("local", "local.image_root_path"),
@@ -18,7 +18,7 @@ class LocalFSJobManager(JobManager):
 
     @staticmethod
     def check_config(config):
-        for section, option in JobManager.mandatory_options:
+        for section, option in LocalFSJobManager.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 

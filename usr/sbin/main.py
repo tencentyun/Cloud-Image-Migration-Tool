@@ -4,8 +4,8 @@ from __future__ import print_function
 import os
 import sys
 
-from job_manager import JobManager
 from config_loader import ConfigLoader
+from base_job_manager import BaseJobManager
 from local_fs_job_manager import LocalFSJobManager
 
 def check_args(argv):
@@ -42,7 +42,7 @@ def check_config(config):
         "1": (LocalFSJobManager, None),
                        }
 
-    check_result = JobManager.check_config(config)
+    check_result = BaseJobManager.check_config(config)
     if check_result:
         return check_result
 

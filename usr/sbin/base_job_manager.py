@@ -6,7 +6,7 @@ import abc
 import sqlite3
 
 
-class JobManager(object):
+class BaseJobManager(object):
     __metaclass__ = abc.ABCMeta
 
     mandatory_options = [
@@ -78,7 +78,7 @@ class JobManager(object):
 
     @staticmethod
     def check_config(config):
-        for section, option in JobManager.mandatory_options:
+        for section, option in BaseJobManager.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 
