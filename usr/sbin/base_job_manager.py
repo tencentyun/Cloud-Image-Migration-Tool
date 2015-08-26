@@ -22,7 +22,7 @@ class BaseJobManager(object):
         self.db_connect.text_factory = str
         self.db_cursor = self.db_connect.cursor()
 
-        self.db_cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        self.db_cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
         tables = [ x[0] for x in self.db_cursor.fetchall() ]
 
         # create table
