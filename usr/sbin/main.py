@@ -40,7 +40,7 @@ def check_args(argv):
 def check_config(config):
     derived_managers = { 
         "1": (LocalFSJobManager, None),
-                      }
+                       }
 
     check_result = JobManager.check_config(config)
     if check_result:
@@ -77,6 +77,11 @@ if __name__ == "__main__":
 
     # load configurations
     config = ConfigLoader.load(conf_path)
+    config["paths"] = dict()
+    config["paths"]["lib_path"] = lib_path
+    config["paths"]["conf_path"] = conf_path
+    config["paths"]["log_path"] = log_path
+    config["paths"]["job_db_path"] = os.path.join(log_path, "jobs.db")
 
     # check configurations
     check_result = check_config(config)
@@ -86,5 +91,4 @@ if __name__ == "__main__":
     else:
         (job_manager, process_manager) = check_result
 
-    print(job_manager)
-    print(process_manager)
+    job_manager.do()

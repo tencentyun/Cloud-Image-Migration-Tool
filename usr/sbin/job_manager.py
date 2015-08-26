@@ -1,19 +1,80 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import abc
+import sqlite3
 
 
 class JobManager(object):
     __metaclass__ = abc.ABCMeta
 
     mandatory_options = [
-                          ("migrateinfo", "migrate.type"),
+        ("migrateinfo", "migrate.type"),
                         ]
 
     def __init__(self, config):
         self.config = config
-        # TODO
-        # init db
+
+        db_path = config["paths"]["job_db_path"]
+
+        self.db_connect = sqlite3.connect(db_path)
+        self.db_connect.text_factory = str
+        self.db_cursor = self.db_connect.cursor()
+
+        self.db_cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = [ x[0] for x in self.db_cursor.fetchall() ]
+
+        # create table
+        # TABLE jobs
+        # | fileid | status | log | src |
+        # fileid: primary key
+        # status: 0 -- new submitted, 1 -- successful, 2 -- failed
+        # log: error log
+
+        if "jobs" not in tables or "metadata" not in tables:
+            if "jobs" in tables:
+                self.db_cursor.execute("DROP TABLE jobs")
+            if "metadata" in tables:
+                slef.db_cursor.execute("DROP TABLE metadata")
+            
+            self.db_cursor.execute(
+                """CREATE TABLE jobs (
+                    fildid TEXT PRIMARY KEY NOT NULL, 
+                    status INT NOT NULL, 
+                    log TEXT, 
+                    src TEXT)
+                """)
+            self.db_cursor.execute("CREATE INDEX status_index ON jobs(status)")
+            self.db_cursor.execute(
+                """CREATE TABLE metadata ( 
+                    key TEXT PRIMARY KEY NOT NULL, 
+                    value TEXT)
+                """)
+            self.db_cursor.execute(
+                """INSERT INTO metadata VALUES 
+                    ('submitted', '0'),
+                    ('successful', '0'),
+                    ('failed', '0')
+                """)
+
+        self.db_connect.commit()
+
+        self.new_submitted = 0
+        self.submit_error = 0
+
+    def __del__(self):
+        old_submitted = self.db_cursor.execute(
+            "SELECT value FROM metadata WHERE key = 'submitted'"
+        ).fetchone()
+        old_submitted = int(old_submitted[0])
+
+        self.db_cursor.execute(
+            "UPDATE metadata SET value = ? WHERE key = 'submitted'", (old_submitted + self.new_submitted, )
+        )
+
+        self.db_connect.commit()
+        self.db_connect.close()
 
     @staticmethod
     def check_config(config):
@@ -23,8 +84,18 @@ class JobManager(object):
 
         return None
 
-    def submit(fileid, src):
+    def submit(self, fileid, src):
+        #TODO: filter
+        #print("get submit: %s, %s" % (fileid, src))
+        try:
+            self.db_cursor.execute(
+                "INSERT INTO jobs VALUES (?, 0, NULL, ?)", (fileid, src)
+            )
+        except sqlite3.Error:
+            self.submit_error += 1 
+        else:
+            self.new_submitted += 1
+
+    @abc.abstractmethod
+    def do(self):
         pass
-
-
-
