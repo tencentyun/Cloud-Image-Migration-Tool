@@ -11,6 +11,7 @@ class BaseJobManager(object):
 
     mandatory_options = [
         ("migrateinfo", "migrate.type"),
+        ("paths", "job_db_path"),
                         ]
 
     def __init__(self, config):
