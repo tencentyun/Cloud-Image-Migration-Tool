@@ -7,6 +7,7 @@ import sys
 from config_loader import ConfigLoader
 from base_job_manager import BaseJobManager
 from local_fs_job_manager import LocalFSJobManager
+from master import Master
 
 def check_args(argv):
     if len(sys.argv) < 4:
@@ -42,10 +43,12 @@ def check_config(config):
         "1": (LocalFSJobManager, None),
                        }
 
+    # check config for base job manager
     check_result = BaseJobManager.check_config(config)
     if check_result:
         return check_result
-
+    
+    # check config for derived job manager and slave
     job_manager = derived_managers[config["migrateinfo"]["migrate.type"]][0](config)
     #process_manager = derived_managers[config["migrateinfo"]["migrate.type"]][1]()
 
@@ -58,6 +61,11 @@ def check_config(config):
     if check_result:
         return check_result
     '''
+
+    # check config for master
+    check_result = Master.check_config(config)
+    if check_result:
+        return check_result
     
     return (job_manager, None)
 
@@ -91,8 +99,11 @@ if __name__ == "__main__":
     else:
         (job_manager, process_manager) = check_result
 
+    # submit procedure
     job_manager.do()
     
     print("New submitted: %d" % job_manager.new_submitted)
     print("Submit failed: %d" % job_manager.submit_error)
     
+    # upload procedure
+    master = Master(config)

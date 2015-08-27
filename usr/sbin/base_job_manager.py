@@ -5,7 +5,6 @@ from __future__ import print_function
 import abc
 import sqlite3
 
-
 class BaseJobManager(object):
     __metaclass__ = abc.ABCMeta
 
@@ -41,10 +40,11 @@ class BaseJobManager(object):
             
             self.db_cursor.execute(
                 """CREATE TABLE jobs (
-                    fildid TEXT PRIMARY KEY NOT NULL, 
+                    serial INT PRIMARY KEY NOT NULL,
+                    fildid TEXT, 
                     status INT NOT NULL, 
-                    log TEXT, 
-                    src TEXT)
+                    src TEXT, 
+                    log TEXT)
                 """)
             self.db_cursor.execute("CREATE INDEX status_index ON jobs(status)")
             self.db_cursor.execute(
@@ -56,7 +56,8 @@ class BaseJobManager(object):
                 """INSERT INTO metadata VALUES 
                     ('submitted', '0'),
                     ('successful', '0'),
-                    ('failed', '0')
+                    ('failed', '0'),
+                    ('last_selected', '0')
                 """)
 
         self.db_connect.commit()
@@ -65,13 +66,8 @@ class BaseJobManager(object):
         self.submit_error = 0
 
     def __del__(self):
-        old_submitted = self.db_cursor.execute(
-            "SELECT value FROM metadata WHERE key = 'submitted'"
-        ).fetchone()
-        old_submitted = int(old_submitted[0])
-
         self.db_cursor.execute(
-            "UPDATE metadata SET value = ? WHERE key = 'submitted'", (old_submitted + self.new_submitted, )
+            "UPDATE metadata SET value = value + ? WHERE key = 'submitted'", (self.new_submitted, )
         )
 
         self.db_connect.commit()
@@ -90,7 +86,7 @@ class BaseJobManager(object):
         #print("get submit: %s, %s" % (fileid, src))
         try:
             self.db_cursor.execute(
-                "INSERT INTO jobs VALUES (?, 0, NULL, ?)", (fileid, src)
+                "INSERT INTO jobs VALUES (NULL, ?, 0, ?, NULL)", (fileid, src)
             )
         except sqlite3.Error:
             self.submit_error += 1 
