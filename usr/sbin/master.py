@@ -2,8 +2,9 @@
 
 from __future__ import print_function
 import os
-import sqlite3
+import signal
 import multiprocessing
+import sqlite3
 from collections import deque
 
 class Master(object):
@@ -133,6 +134,8 @@ class Master(object):
             self.job_queue_size += 1
 
     def start(self):
+        signal.signal(signal.SIGINT, lambda signum, frame: None)        
+
         self.create_slaves()
 
         self.job_queue_size = 0

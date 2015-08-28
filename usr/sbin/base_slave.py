@@ -3,6 +3,7 @@
 from __future__ import print_function
 import os
 import abc
+import signal
 
 class BaseSlave(object):
     __metaclass__ = abc.ABCMeta 
@@ -10,6 +11,7 @@ class BaseSlave(object):
     mandatory_options = [ ]
 
     def __init__(self, config):
+        self.interrupted = False
         self.config = config
 
     @staticmethod
@@ -30,8 +32,17 @@ class BaseSlave(object):
         """
         pass
 
+
     def start(self, job_queue, log_queue):
+        def sigint_handler(signum, frame):
+            self.interrupted = True
+        signal.signal(signal.SIGINT, sigint_handler)
+    
         while True:
+            if self.interrupted:
+                log_queue.put("quit")
+                break
+
             job = job_queue.get()
 
             if job == "no more jobs":
