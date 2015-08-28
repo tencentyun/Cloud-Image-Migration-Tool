@@ -40,8 +40,8 @@ class BaseJobManager(object):
             
             self.db_cursor.execute(
                 """CREATE TABLE jobs (
-                    serial INT PRIMARY KEY NOT NULL,
-                    fildid TEXT, 
+                    serial INTEGER PRIMARY KEY,
+                    fileid TEXT NOT NULL UNIQUE, 
                     status INT NOT NULL, 
                     src TEXT, 
                     log TEXT)
