@@ -7,6 +7,7 @@ import sys
 from config_loader import ConfigLoader
 from base_job_manager import BaseJobManager
 from local_fs_job_manager import LocalFSJobManager
+from url_slave import URLSlave
 from master import Master
 
 def check_args(argv):
@@ -39,8 +40,8 @@ def check_args(argv):
     return (lib_path, conf_path, log_path)
 
 def check_config(config):
-    derived_managers = { 
-        "1": (LocalFSJobManager, None),
+    derived_classes = { 
+        "1": (LocalFSJobManager, URLSlave),
                        }
 
     # check config for base job manager
@@ -48,26 +49,24 @@ def check_config(config):
     if check_result:
         return check_result
     
+    job_manager_class = derived_classes[config["migrateinfo"]["migrate.type"]][0]
+    slave_class = derived_classes[config["migrateinfo"]["migrate.type"]][1]
+
     # check config for derived job manager and slave
-    job_manager = derived_managers[config["migrateinfo"]["migrate.type"]][0](config)
-    #process_manager = derived_managers[config["migrateinfo"]["migrate.type"]][1]()
-
-    check_result = job_manager.check_config(config)
+    check_result = job_manager_class.check_config(config)
     if check_result:
         return check_result
 
-    '''
-    check_result = process_manager.check_config(config)
+    check_result = slave_class.check_config(config)
     if check_result:
         return check_result
-    '''
 
     # check config for master
     check_result = Master.check_config(config)
     if check_result:
         return check_result
     
-    return (job_manager, None)
+    return (job_manager_class, slave_class)
 
 # command line arguments: lib_path conf_path log_path
 if __name__ == "__main__":
@@ -97,13 +96,15 @@ if __name__ == "__main__":
         print(check_result)
         exit(1)
     else:
-        (job_manager, process_manager) = check_result
+        (job_manager_class, slave_class) = check_result
 
     # submit procedure
-    job_manager.do()
+    job_manager = job_manager_class(config)
+    #job_manager.do()
     
-    print("New submitted: %d" % job_manager.new_submitted)
-    print("Submit failed: %d" % job_manager.submit_error)
+    #print("New submitted: %d" % job_manager.new_submitted)
+    #print("Submit failed: %d" % job_manager.submit_error)
     
     # upload procedure
-    master = Master(config)
+    master = Master(config, slave_class)
+    master.start()

@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+import os
 import sqlite3
 import multiprocessing
+from collections import deque
 
 class Master(object):
 
@@ -10,8 +13,9 @@ class Master(object):
         ("toolconfig", "concurrency"),
                         ]
     
-    def __init__(self, config):
+    def __init__(self, config, SlaveClass):
         self.config = config
+        self.SlaveClass = SlaveClass
 
         db_path = config["paths"]["job_db_path"]
 
@@ -33,17 +37,15 @@ class Master(object):
             END) 
             WHERE key = 'last_selected';"""
         )
-        selc.db_connect.commit()
+        self.db_connect.commit()
 
         self.no_more_jobs = False
 
-        self.create_slaves()
-
 
     def __del__(self):
+        self.db_connect.commit()
         self.db_connect.close()
 
-        # TODO: temrinate slave processes
 
     @staticmethod
     def check_config(config):
@@ -55,41 +57,42 @@ class Master(object):
             return "Error: Minumums of ToolConfig.concurrency is 1. "
         
         db_path = config["paths"]["job_db_path"]
-        connect = sqlite3.connect(db_path)
-        cursor = connect.cursor()
-        cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
-        tables = [ x[0] for x in cursor.fetchall() ]
+        if os.path.isfile(db_path):
+            connect = sqlite3.connect(db_path)
+            cursor = connect.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+            tables = [ x[0] for x in cursor.fetchall() ]
 
-        try:
-            if "jobs" not in tables:
-                return "Error: table jobs does not exist. "
-            if "metadata" not in tables:
-                return "Error: table metadata does not exist. "
-        finally:
-            connect.close()
+            try:
+                if "jobs" not in tables:
+                    return "Error: table jobs does not exist. "
+                if "metadata" not in tables:
+                    return "Error: table metadata does not exist. "
+            finally:
+                connect.close()
 
     def create_slaves(self):
-        num_slaves = int(config["toolconfig"]["concurrency"])
+        num_slaves = int(self.config["toolconfig"]["concurrency"])
         self.slaves = []
         self.job_queue = multiprocessing.Queue()
         self.log_queue = multiprocessing.Queue()
 
-        for i in range(num_slaves):
-            slave = multiprocessing.Process(target = None, args = None)
-        slave.daemon = True
-        slave.start()
 
-        self.slaves.append(slave)
+        for _ in range(num_slaves):
+            slave_class = self.SlaveClass(self.config)
+            slave = multiprocessing.Process(target = slave_class.start, args = (self.job_queue, self.log_queue))
+            slave.daemon = True
+            slave.start()
 
-    def write_log(self, (fileid, status, log)):
-        self.job_queue_size -= 1
+            self.slaves.append(slave)
 
+    def write_log(self, (serial, fileid, status, log)):
         self.db_cursor.execute(
-            "UPDATE jobs SET status = ?, log = ? WHERE fileid = ?", (fileid, status, log)
+            "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
         )
 
         self.db_cursor.execute(
-            "UPDATE metadata SET value = value + 1 WHERE key = ?", "successful" if status == 1 else "failed"
+            "UPDATE metadata SET value = value + 1 WHERE key = ?", ("successful" if status == 1 else "failed",)
         )
 
     def load_job(self):
@@ -104,48 +107,49 @@ class Master(object):
                 WHERE status <> 1 AND 
                       serial > (SELECT value FROM metadata WHERE key == 'last_selected') 
                 ORDER BY serial 
-                LIMIT ?""", self.job_queue_buffer_max_size
+                LIMIT ?""", (self.job_queue_buffer_max_size,)
         )
         for job in self.db_cursor.fetchall():
             self.job_queue_buffer.append(job)
-        self.job_queue_buffer.reverse()
 
         if self.job_queue_buffer:
-            last_selected = self.job_queue_buffer[0][0]
+            last_selected = self.job_queue_buffer[-1][0]
             self.db_cursor.execute(
-                "UPDATE metadata SET value = ? where key = 'last_selected'", last_selected
+                "UPDATE metadata SET value = ? where key = 'last_selected'", (last_selected,)
             )
         else:
-            job_queue_buffer.extend([ "no more jobs" ] * len(self.slaves))
+            self.job_queue_buffer.extend([ "no more jobs" ] * len(self.slaves))
             self.no_more_jobs = True
 
         self.db_connect.commit()
 
     def fill_job_queue(self):
-        self.job_queue_size = 0
-        self.job_queue_max_size = 300
-        # move constans to config
-        # TODO: use deque
-        self.job_queue_buffer = []
-        self.job_queue_buffer_max_size = 100000
-
         for _ in range(self.job_queue_max_size - self.job_queue_size):
             if not self.job_queue_buffer:
                 self.load_job()
                 if not self.job_queue_buffer:
                     break
-            self.job_queue.put(self.job_queue_buffer.pop())
+            self.job_queue.put(self.job_queue_buffer.popleft())
+            self.job_queue_size += 1
 
-    def start(self);
+    def start(self):
         self.create_slaves()
+
+        self.job_queue_size = 0
+        self.job_queue_max_size = 500
+        # TODO: move constans to config
+        self.job_queue_buffer = deque()
+        self.job_queue_buffer_max_size = 100000
 
         num_quit = 0
         
         while True:
             # fill job queue
-            self.fill_job_queue() 
+            if self.job_queue_size < 200:
+                self.fill_job_queue() 
             # fetch a log
             log = self.log_queue.get()
+            print("get looooog:", log)
             # handle log
             if log == "quit":
                 num_quit += 1
@@ -153,6 +157,7 @@ class Master(object):
                     break
             else:
                 self.write_log(log)
+            self.job_queue_size -= 1
         
         for slave in self.slaves:
             slave.join()
