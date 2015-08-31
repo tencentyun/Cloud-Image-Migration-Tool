@@ -13,7 +13,7 @@ from url_slave import URLSlave
 from base_uploader import BaseUploader
 
 
-# import non-built in modules here
+# import non-builtin modules or modules contain non-builtin modules here
 def import_libs():
     global CloudImageV2Uploader  
     from civ2_uploader import CloudImageV2Uploader
@@ -111,6 +111,7 @@ if __name__ == "__main__":
 
     # load configurations
     config = ConfigLoader.load(conf_path)
+    print(config)
     config["paths"] = dict()
     config["paths"]["lib_path"] = lib_path
     config["paths"]["conf_path"] = conf_path
