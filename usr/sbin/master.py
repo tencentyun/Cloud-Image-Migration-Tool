@@ -122,6 +122,7 @@ class Master(object):
             self.job_queue_buffer.extend([ "no more jobs" ] * len(self.slaves))
             self.no_more_jobs = True
 
+        # TODO: need commit?
         self.db_connect.commit()
 
     def fill_job_queue(self):
