@@ -8,7 +8,7 @@ class URLSlave(BaseSlave):
         super(URLSlave, self).__init__(config)
         self.uploader_class = UploaderClass(config)
 
-    # implementation abstract method
+    # implementation of abstract method
     def do_job(self, job):
         """
         type job: (index, fileid, source)
