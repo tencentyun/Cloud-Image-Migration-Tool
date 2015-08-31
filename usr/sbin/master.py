@@ -12,6 +12,9 @@ class Master(object):
     mandatory_options = [
         ("paths", "job_db_path"),
         ("toolconfig", "concurrency"),
+        ("toolconfig", "jobqueue.capacity"),
+        ("toolconfig", "jobqueue.reload.threshold"),
+        ("toolconfig", "buffer.size"),
                         ]
     
     def __init__(self, config, SlaveClass, UploaderClass):
@@ -56,7 +59,20 @@ class Master(object):
 
         if not config["toolconfig"]["concurrency"].isdigit() or int(config["toolconfig"]["concurrency"]) <= 0:
             return "Error: Minumums of ToolConfig.concurrency is 1. "
+
+        if not config["toolconfig"]["jobqueue.capacity"].isdigit() or int(config["toolconfig"]["jobqueue.capacity"]) <= 0:
+            return "Error: Minimums of ToolConfig.jobqueue.capacity is 1. "
+
+        try:
+            reload_th = float(config["toolconfig"]["jobqueue.reload.threshold"])
+            if reload_th <= 0 or reload_th > 1:
+                return "Error: ToolConfig.jobqueue.reload.threshold should within range (0, 1]. "
+        except ValueError:
+            return "Error: ToolConfig.jobqueue.reload.threshold should within range (0, 1]. "
         
+        if not config["toolconfig"]["buffer.size"].isdigit() or int(config["toolconfig"]["buffer.size"]) <= 0:
+            return "Error: Minimums of ToolConfig.buffer.sizeis 1. "
+
         db_path = config["paths"]["job_db_path"]
         if os.path.isfile(db_path):
             connect = sqlite3.connect(db_path)
@@ -136,16 +152,16 @@ class Master(object):
         self.create_slaves()
 
         self.job_queue_size = 0
-        self.job_queue_max_size = 500
-        # TODO: move constans to config
+        self.job_queue_max_size = int(self.config["toolconfig"]["jobqueue.capacity"])
         self.job_queue_buffer = deque()
-        self.job_queue_buffer_max_size = 100000
+        self.job_queue_buffer_max_size = int(self.config["toolconfig"]["buffer.size"])
+        self.job_queue.reload_size = self.job_queue_max_size * float(self.config["toolconfig"]["jobqueue.reload.threshold"])
 
         num_quit = 0
         
         while True:
             # fill job queue
-            if self.job_queue_size < 200:
+            if self.job_queue_size < self.job_queue.reload_size:
                 self.fill_job_queue() 
             # fetch a log
             log = self.log_queue.get()
@@ -158,6 +174,7 @@ class Master(object):
             else:
                 self.write_log(log)
             self.job_queue_size -= 1
-        
+
         for slave in self.slaves:
             slave.join()
+        
