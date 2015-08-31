@@ -48,6 +48,11 @@ def check_config(config):
     check_result = BaseJobManager.check_config(config)
     if check_result:
         return check_result
+
+    # check config for base slave
+    check_result = BaseSlave.check_config(config)
+    if check_result:
+        return check_result
     
     job_manager_class = derived_classes[config["migrateinfo"]["migrate.type"]][0]
     slave_class = derived_classes[config["migrateinfo"]["migrate.type"]][1]
