@@ -79,7 +79,6 @@ class BaseJobManager(object):
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 
-        return None
 
     def submit(self, fileid, src):
         #TODO: filter
