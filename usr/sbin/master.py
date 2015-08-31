@@ -50,7 +50,6 @@ class Master(object):
         self.db_connect.commit()
         self.db_connect.close()
 
-
     @staticmethod
     def check_config(config):
         for section, option in Master.mandatory_options:
@@ -165,15 +164,20 @@ class Master(object):
                 self.fill_job_queue() 
             # fetch a log
             log = self.log_queue.get()
-            print("get looooog:", log)
             # handle log
             if log == "quit":
                 num_quit += 1
                 if num_quit == len(self.slaves):
                     break
             else:
+                print(log[0], "l")
                 self.write_log(log)
             self.job_queue_size -= 1
+
+        self.db_connect.commit()
+
+        self.job_queue.cancel_join_thread()
+        self.log_queue.cancel_join_thread()
 
         for slave in self.slaves:
             slave.join()
