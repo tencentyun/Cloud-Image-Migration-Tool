@@ -27,17 +27,16 @@ class Master(object):
 
         # if all jobs have already been traversed, set the cursor to start
         # so as to retry all failed jobs
+        # else set cursor to the first job not attempted yet
         self.db_cursor.execute(
         """UPDATE metadata SET value = 
-            (CASE WHEN 
-                (SELECT COUNT(*) 
-                    FROM jobs 
-                    WHERE status == 0 AND 
-                          serial > (SELECT value FROM metadata WHERE key == "last_selected")) <> 0 
-                THEN value 
-                ELSE 0 
-            END) 
-            WHERE key = 'last_selected';"""
+            (SELECT 
+                COALESCE(
+                    (SELECT serial FROM jobs WHERE status = 0 ORDER BY serial LIMIT 1), 
+                    1) 
+                - 1)
+            WHERE key = 'last_selected'
+        """
         )
         self.db_connect.commit()
 
