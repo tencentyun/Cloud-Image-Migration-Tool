@@ -2,30 +2,32 @@
 
 from base_uploader import BaseUploader
 
+import time
 import tencentyun
 
 class CloudImageV2Uploader(BaseUploader):
     mandatory_options = [
         ("appinfo", "appinfo.appid"),
         ("appinfo", "appinfo.bucket"),
-        ("appinfo", "appinfo.secretID"),
-        ("appinfo", "appinfo.secretKey"),
+        ("appinfo", "appinfo.secretid"),
+        ("appinfo", "appinfo.secretkey"),
                         ]
 
     def __init__(self, config):
         super(CloudImageV2Uploader, self).__init__(config)
         self.appid = config["appinfo"]["appinfo.appid"]
         self.bucket = config["appinfo"]["appinfo.bucket"]
-        self.secret_ID = config["appinfo"]["appinfo.secretID"]
-        self.secret_key = config["appinfo"]["appinfo.secretKey"]
+        self.secret_ID = config["appinfo"]["appinfo.secretid"]
+        self.secret_key = config["appinfo"]["appinfo.secretkey"]
         self.image_obj = tencentyun.ImageV2(self.appid, self.secret_ID, self.secret_key)
     
     @staticmethod
     def check_config(config):
-        for section, option in BaseSlave.mandatory_options:
+        for section, option in CloudImageV2Uploader.mandatory_options:
             if section not in config or option not in config[section]:
-                return "Error: Option %s.%s is required. "
+                return "Error: Option %s.%s is required. " % (section, option)
 
+    # implementation of abstract method
     def upload(self, job):
         """
         type job: (fileid, source)
@@ -39,6 +41,12 @@ class CloudImageV2Uploader(BaseUploader):
         new_fileid = fileid
         status = None
         log = None
+
+
+        print("get job:", job)
+        # TODO: debug
+        time.sleep(0)
+        return (new_fileid, 1, log)
 
         try:
             response_obj = self.image_obj.upload_binary(source, self.bucket, fileid)
