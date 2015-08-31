@@ -2,13 +2,27 @@
 
 from __future__ import print_function
 from base_slave import BaseSlave
-import time
 
 class URLSlave(BaseSlave):
-    def __init__(self, config):
+    def __init__(self, config, UploaderClass):
         super(URLSlave, self).__init__(config)
+        self.uploader_class = UploaderClass(config)
 
+    # implementation abstract method
     def do_job(self, job):
-        print("get job:", job)
-        #time.sleep(0.5)
-        return (job[0], job[1], 1, None)
+        """
+        type job: (index, fileid, source)
+        rtype: (index, new fileid, status, log)
+        
+        do not throw any exception
+        """
+        serial = job[0]
+        fileid = job[1]
+        src = job[2]
+        
+        # TODO: read source
+
+        (new_fileid, status, log) = self.uploader_class.upload((fileid, src))
+
+        return (serial, new_fileid, status, log)
+

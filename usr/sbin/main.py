@@ -5,10 +5,18 @@ import os
 import sys
 
 from config_loader import ConfigLoader
+from master import Master
 from base_job_manager import BaseJobManager
 from local_fs_job_manager import LocalFSJobManager
+from base_slave import BaseSlave
 from url_slave import URLSlave
-from master import Master
+from base_uploader import BaseUploader
+
+
+# import non-built in modules here
+def import_libs():
+    global CloudImageV2Uploader  
+    from civ2_uploader import CloudImageV2Uploader
 
 def check_args(argv):
     if len(sys.argv) < 4:
@@ -40,9 +48,11 @@ def check_args(argv):
     return (lib_path, conf_path, log_path)
 
 def check_config(config):
+    import_libs()
+
     derived_classes = { 
-        "1": (LocalFSJobManager, URLSlave),
-                       }
+        "1": (LocalFSJobManager, URLSlave, CloudImageV2Uploader),
+                      }
 
     # check config for base job manager
     check_result = BaseJobManager.check_config(config)
@@ -53,11 +63,18 @@ def check_config(config):
     check_result = BaseSlave.check_config(config)
     if check_result:
         return check_result
-    
-    job_manager_class = derived_classes[config["migrateinfo"]["migrate.type"]][0]
-    slave_class = derived_classes[config["migrateinfo"]["migrate.type"]][1]
 
-    # check config for derived job manager and slave
+    # check config for base uploader
+    check_result  = BaseUploader.check_config(config)
+    if check_result:
+        return check_reuslt
+    
+    class_type = config["migrateinfo"]["migrate.type"]
+    job_manager_class = derived_classes[class_type][0]
+    slave_class = derived_classes[class_type][1]
+    uploader_class = derived_classes[class_type][2]
+
+    # check config for derived job manager and slave and uploader
     check_result = job_manager_class.check_config(config)
     if check_result:
         return check_result
@@ -66,12 +83,17 @@ def check_config(config):
     if check_result:
         return check_result
 
+    check_result = uploader_class.check_config(config)
+    if check_result:
+        return check_result
+
     # check config for master
     check_result = Master.check_config(config)
     if check_result:
         return check_result
+
     
-    return (job_manager_class, slave_class)
+    return (job_manager_class, slave_class, uploader_class)
 
 # command line arguments: lib_path conf_path log_path
 if __name__ == "__main__":
@@ -101,7 +123,7 @@ if __name__ == "__main__":
         print(check_result)
         exit(1)
     else:
-        (job_manager_class, slave_class) = check_result
+        (job_manager_class, slave_class, uploader_class) = check_result
 
     # submit procedure
     job_manager = job_manager_class(config)
@@ -111,5 +133,5 @@ if __name__ == "__main__":
     #print("Submit failed: %d" % job_manager.submit_error)
     
     # upload procedure
-    master = Master(config, slave_class)
+    master = Master(config, slave_class, uploader_class)
     master.start()

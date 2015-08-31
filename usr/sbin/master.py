@@ -14,9 +14,10 @@ class Master(object):
         ("toolconfig", "concurrency"),
                         ]
     
-    def __init__(self, config, SlaveClass):
+    def __init__(self, config, SlaveClass, UploaderClass):
         self.config = config
         self.SlaveClass = SlaveClass
+        self.UploaderClass = UploaderClass
 
         db_path = config["paths"]["job_db_path"]
 
@@ -80,7 +81,7 @@ class Master(object):
 
 
         for _ in range(num_slaves):
-            slave_class = self.SlaveClass(self.config)
+            slave_class = self.SlaveClass(self.config, self.UploaderClass)
             slave = multiprocessing.Process(target = slave_class.start, args = (self.job_queue, self.log_queue))
             slave.daemon = True
             slave.start()
