@@ -5,6 +5,7 @@ import os
 import abc
 import signal
 
+
 class BaseSlave(object):
     __metaclass__ = abc.ABCMeta 
 
@@ -18,7 +19,7 @@ class BaseSlave(object):
     def check_config(config):
         for section, option in BaseSlave.mandatory_options:
             if section not in config or option not in config[section]:
-                return "Error: Option %s.%s is required. "
+                return "Error: Option %s.%s is required. " % (section, option)
 
         return None
 
@@ -47,7 +48,7 @@ class BaseSlave(object):
 
             if job == "no more jobs":
                 self.interrupted = True
-            else;
+            else:
                 log_queue.put(self.do_job(job))
 
 
