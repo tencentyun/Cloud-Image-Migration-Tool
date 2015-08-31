@@ -12,9 +12,9 @@ class BaseUploader(object):
 
     @staticmethod
     def check_config(config):
-        for section, option in BaseSlave.mandatory_options:
+        for section, option in BaseUploader.mandatory_options:
             if section not in config or option not in config[section]:
-                return "Error: Option %s.%s is required. "
+                return "Error: Option %s.%s is required. " % (section, option)
 
     @abc.abstractmethod
     def upload(self, job):
