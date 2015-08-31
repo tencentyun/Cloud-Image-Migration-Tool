@@ -111,7 +111,6 @@ if __name__ == "__main__":
 
     # load configurations
     config = ConfigLoader.load(conf_path)
-    print(config)
     config["paths"] = dict()
     config["paths"]["lib_path"] = lib_path
     config["paths"]["conf_path"] = conf_path
