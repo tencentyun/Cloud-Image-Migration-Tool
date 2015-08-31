@@ -13,6 +13,7 @@ class ConfigLoader(object):
         for section in config.sections():
             result[section.lower()] = dict()
             for option in config.options(section):
-                result[section.lower()][option.lower()] = config.get(section, option)
+                if config.get(section, option):
+                    result[section.lower()][option.lower()] = config.get(section, option)
 
         return result
