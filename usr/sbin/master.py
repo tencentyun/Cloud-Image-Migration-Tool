@@ -98,7 +98,6 @@ class Master(object):
 
     def load_job(self):
         if self.job_queue_buffer: return
-        # TODO: This makes it impossible to upload while submitting jobs
         if self.no_more_jobs: return
 
         self.db_cursor.execute(
