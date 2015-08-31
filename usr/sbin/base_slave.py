@@ -46,8 +46,8 @@ class BaseSlave(object):
             job = job_queue.get()
 
             if job == "no more jobs":
-                log_queue.put("quit")
-                break
+                self.interrupted = True
+            else;
+                log_queue.put(self.do_job(job))
 
-            log_queue.put(self.do_job(job))
 
