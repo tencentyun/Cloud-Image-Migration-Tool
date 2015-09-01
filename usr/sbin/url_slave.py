@@ -2,6 +2,8 @@
 
 #from __future__ import print_function
 from base_slave import BaseSlave
+import urlparse
+import urllib
 import urllib2
 import platform
 
@@ -40,6 +42,9 @@ class URLSlave(BaseSlave):
         # TODO: %20 problem
         status, log = None, None
         try:
+            # encode URL
+            url = urlparse.urlunsplit(map(lambda i: urllib.quote(i), urlparse.urlsplit(url)))
+
             req = urllib2.Request(url)
             if referer:
                 req.add_header("Referer", referer)
