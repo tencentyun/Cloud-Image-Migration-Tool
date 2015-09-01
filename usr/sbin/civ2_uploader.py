@@ -43,11 +43,16 @@ class CloudImageV2Uploader(BaseUploader):
         log = None
 
 
-        print("get job:", job)
         # TODO: debug
-        time.sleep(0)
-        return (new_fileid, 1, log)
-
+        '''
+        time.sleep(1)
+        import random
+        x = random.randint(0, 9)
+        if x < 2:
+            return (new_fileid, 2, "error log")
+        else:
+            return (new_fileid, 1, "successful log")
+        '''
         try:
             response_obj = self.image_obj.upload_binary(source, self.bucket, fileid)
 
@@ -63,7 +68,8 @@ class CloudImageV2Uploader(BaseUploader):
                     log.append("code: %d" % response_obj["code"])
                 if "httpcode" in response_obj:
                     log.append("httpcode: %d" % response_obj["httpcode"])
-            log = ", ".join(log)
+            if log:
+                log = ", ".join(log)
         except Exception as e:
             if not status:
                 status = 2
