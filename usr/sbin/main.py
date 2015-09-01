@@ -126,7 +126,7 @@ if __name__ == "__main__":
         (job_manager_class, slave_class, uploader_class) = check_result
 
     # submit procedure
-    job_manager = job_manager_class(config)
+    #job_manager = job_manager_class(config)
     #job_manager.do()
     
     #print("New submitted: %d" % job_manager.new_submitted)
