@@ -39,7 +39,6 @@ class URLSlave(BaseSlave):
         # read source
         # TODO: test for file: ftp: http: https:
         # TODO: redirection
-        # TODO: %20 problem
         status, log = None, None
         try:
             # encode URL
