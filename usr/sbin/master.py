@@ -22,7 +22,16 @@ class Master(object):
         self.SlaveClass = SlaveClass
         self.UploaderClass = UploaderClass
 
-        db_path = config["paths"]["job_db_path"]
+        self.db_connect = None
+        self.db_cursor = None
+
+    # There's a bug on OS X when using urllib with multiprocessing and sqlite3
+    # So this function cannot be called before create_slaves
+    # references:
+    # http://bugs.python.org/issue9405
+    # http://bugs.python.org/issue13829
+    def init_db(self):
+        db_path = self.config["paths"]["job_db_path"]
 
         self.db_connect = sqlite3.connect(db_path)
         self.db_connect.text_factory = str
@@ -47,8 +56,9 @@ class Master(object):
 
 
     def __del__(self):
-        self.db_connect.commit()
-        self.db_connect.close()
+        if self.db_connect:
+            self.db_connect.commit()
+            self.db_connect.close()
 
     @staticmethod
     def check_config(config):
@@ -72,20 +82,6 @@ class Master(object):
         if not config["toolconfig"]["buffer.size"].isdigit() or int(config["toolconfig"]["buffer.size"]) <= 0:
             return "Error: Minimums of ToolConfig.buffer.sizeis 1. "
 
-        db_path = config["paths"]["job_db_path"]
-        if os.path.isfile(db_path):
-            connect = sqlite3.connect(db_path)
-            cursor = connect.cursor()
-            cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
-            tables = [ x[0] for x in cursor.fetchall() ]
-
-            try:
-                if "jobs" not in tables:
-                    return "Error: table jobs does not exist. "
-                if "metadata" not in tables:
-                    return "Error: table metadata does not exist. "
-            finally:
-                connect.close()
 
     def create_slaves(self):
         num_slaves = int(self.config["toolconfig"]["concurrency"])
@@ -149,6 +145,8 @@ class Master(object):
         signal.signal(signal.SIGINT, lambda signum, frame: None)        
 
         self.create_slaves()
+
+        self.init_db()
 
         self.job_queue_size = 0
         self.job_queue_max_size = int(self.config["toolconfig"]["jobqueue.capacity"])
