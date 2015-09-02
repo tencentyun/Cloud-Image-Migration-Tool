@@ -27,7 +27,7 @@ def extract_fileid(db_file):
 
 def do_delete(fileid):
     try:
-        print(image_obj.delete(bucket, fileid)["message"])
+        print(image_obj.delete(bucket, fileid)["message"].encode("utf-8"))
     except Exception as e:
         print(e)
 
