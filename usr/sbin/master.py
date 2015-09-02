@@ -134,11 +134,13 @@ class Master(object):
                 ORDER BY serial 
                 LIMIT ?""", (self.job_queue_buffer_max_size,)
         )
+        
+        last_selected = None
         for job in self.db_cursor.fetchall():
             self.job_queue_buffer.append(job)
+            last_selected = job[0]
 
-        if self.job_queue_buffer:
-            last_selected = self.job_queue_buffer[-1][0]
+        if last_selected is not None:
             self.db_cursor.execute(
                 "UPDATE metadata SET value = ? where key = 'last_selected'", (last_selected,)
             )
