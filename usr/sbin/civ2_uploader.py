@@ -43,16 +43,6 @@ class CloudImageV2Uploader(BaseUploader):
         log = None
 
 
-        # TODO: debug
-        '''
-        time.sleep(1)
-        import random
-        x = random.randint(0, 9)
-        if x < 2:
-            return (new_fileid, 2, "error log")
-        else:
-            return (new_fileid, 1, "successful log")
-        '''
         try:
             response_obj = self.image_obj.upload_binary(source, self.bucket, fileid)
 
