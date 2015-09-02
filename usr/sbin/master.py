@@ -3,6 +3,8 @@
 from __future__ import print_function
 import os
 import signal
+import math
+import time
 import multiprocessing
 import sqlite3
 from collections import deque
@@ -15,6 +17,7 @@ class Master(object):
         ("toolconfig", "jobqueue.capacity"),
         ("toolconfig", "jobqueue.reload.threshold"),
         ("toolconfig", "buffer.size"),
+        ("toolconfig", "db.commit.interval"),
                         ]
     
     def __init__(self, config, SlaveClass, UploaderClass):
@@ -53,7 +56,8 @@ class Master(object):
         self.db_connect.commit()
 
         self.no_more_jobs = False
-
+        self.db_commit_interval = float(self.config["toolconfig"]["db.commit.interval"])
+        self.db_last_commit = 0
 
     def __del__(self):
         if self.db_connect:
@@ -78,6 +82,13 @@ class Master(object):
                 return "Error: ToolConfig.jobqueue.reload.threshold should within range (0, 1]. "
         except ValueError:
             return "Error: ToolConfig.jobqueue.reload.threshold should within range (0, 1]. "
+
+        try:
+            db_commit_interval = float(config["toolconfig"]["db.commit.interval"])
+            if db_commit_interval <= 0 or math.isnan(db_commit_interval):
+                return "Error: Invalid value for ToolConfig.db.commit.interval. "
+        except ValueError:
+            return "Error: Invalid value for ToolConfig.db.commit.interval. "
         
         if not config["toolconfig"]["buffer.size"].isdigit() or int(config["toolconfig"]["buffer.size"]) <= 0:
             return "Error: Minimums of ToolConfig.buffer.sizeis 1. "
@@ -99,7 +110,6 @@ class Master(object):
             self.slaves.append(slave)
 
     def write_log(self, (serial, fileid, status, log)):
-        # TODO: commit periodically
         self.db_cursor.execute(
             "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
         )
@@ -107,6 +117,10 @@ class Master(object):
         self.db_cursor.execute(
             "UPDATE metadata SET value = value + 1 WHERE key = ?", ("successful" if status == 1 else "failed",)
         )
+
+        if self.db_last_commit + self.db_commit_interval < time.time():
+            self.db_connect.commit()
+            self.db_last_commit = time.time()
 
     def load_job(self):
         if self.job_queue_buffer: return
