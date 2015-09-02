@@ -128,9 +128,9 @@ if __name__ == "__main__":
     # submit procedure
     #job_manager = job_manager_class(config)
     #job_manager.do()
-    
     #print("New submitted: %d" % job_manager.new_submitted)
     #print("Submit failed: %d" % job_manager.submit_error)
+    #print("Ignored: %d" % job_manager.ignore)
     
     # upload procedure
     master = Master(config, slave_class, uploader_class)

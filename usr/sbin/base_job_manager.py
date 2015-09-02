@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 
+import re
 import abc
 import sqlite3
 
@@ -59,8 +60,20 @@ class BaseJobManager(object):
             self.db_cursor.execute("INSERT INTO metadata VALUES ('last_selected', '0')")
         self.db_connect.commit()
 
+        if "advanced" in config and "fileid.ignore_if" in config["advanced"]:
+            self.fileid_ignore_if = re.compile(config["advanced"]["fileid.ignore_if"])
+        else:
+            self.fileid_ignore_if = None
+
+        if "advanced" in config and "fileid.ignore_unless" in config["advanced"]:
+            self.fileid_ignore_unless = re.compile(config["advanced"]["fileid.ignore_unless"])
+        else:
+            self.fileid_ignore_unless = None
+
         self.new_submitted = 0
+        self.ignore = 0
         self.submit_error = 0
+
 
     def __del__(self):
         self.db_cursor.execute(
@@ -76,10 +89,27 @@ class BaseJobManager(object):
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 
+        if "advanced" in config and "fileid.ignore_if" in config["advanced"]:
+            try:
+                re.compile(config["advanced"]["fileid.ignore_if"])
+            except re.error:
+                return "Error: Regex syntax error for Advanced.fileid.ignore_if. "
+
+        if "advanced" in config and "fileid.ignore_unless" in config["advanced"]:
+            try:
+                re.compile(config["advanced"]["fileid.ignore_unless"])
+            except re.error:
+                return "Error: Regex syntax error for Advanced.fileid.ignore_unless. "
+
 
     def submit(self, fileid, src):
-        #TODO: filter
-        #print("get submit: %s, %s" % (fileid, src))
+        if self.fileid_ignore_if and self.fileid_ignore_if.match(fileid):
+            self.ignore += 1
+            return
+        if self.fileid_ignore_unless and not self.fileid_ignore_unless.match(fileid):
+            self.ignore += 1
+            return
+         
         try:
             self.db_cursor.execute(
                 "INSERT INTO jobs VALUES (NULL, ?, 0, ?, NULL)", (fileid, src)
