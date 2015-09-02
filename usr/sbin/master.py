@@ -3,6 +3,7 @@
 from __future__ import print_function
 import os
 import signal
+import re
 import math
 import time
 import multiprocessing
@@ -27,6 +28,11 @@ class Master(object):
 
         self.db_connect = None
         self.db_cursor = None
+
+        if "advanced" in config and "error.ignore.if" in config["advanced"]:
+            self.ignore_error_if = re.compile(config["advanced"]["error.ignore.if"])
+        else:
+            self.ignore_error_if = None
 
     # There's a bug on OS X when using urllib with multiprocessing and sqlite3
     # So this function cannot be called before create_slaves
@@ -93,6 +99,11 @@ class Master(object):
         if not config["toolconfig"]["buffer.size"].isdigit() or int(config["toolconfig"]["buffer.size"]) <= 0:
             return "Error: Minimums of ToolConfig.buffer.sizeis 1. "
 
+        if "advanced" in config and "error.ignore.if" in config["advanced"]:
+            try:
+                re.compile(config["advanced"]["error.ignore.if"])
+            except re.error:
+                return "Error: Regex syntax error for Advanced.error.ignore.if. "
 
     def create_slaves(self):
         num_slaves = int(self.config["toolconfig"]["concurrency"])
@@ -127,7 +138,7 @@ class Master(object):
         if self.no_more_jobs: return
 
         self.db_cursor.execute(
-            """SELECT serial, fileid, src 
+            """SELECT serial, fileid, src, log
                 FROM jobs 
                 WHERE status <> 1 AND 
                       serial > (SELECT value FROM metadata WHERE key == 'last_selected') 
@@ -137,8 +148,15 @@ class Master(object):
         
         last_selected = None
         for job in self.db_cursor.fetchall():
-            self.job_queue_buffer.append(job)
-            last_selected = job[0]
+            job_serial = job[0]
+            job_log = job[3]
+            job_info = job[: -1]
+
+            if self.ignore_error_if and job_log and self.ignore_error_if.match(job_log):
+                continue
+
+            self.job_queue_buffer.append(job_info)
+            last_selected = job_serial
 
         if last_selected is not None:
             self.db_cursor.execute(
