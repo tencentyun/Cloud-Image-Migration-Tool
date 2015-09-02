@@ -99,6 +99,7 @@ class Master(object):
             self.slaves.append(slave)
 
     def write_log(self, (serial, fileid, status, log)):
+        # TODO: commit periodically
         self.db_cursor.execute(
             "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
         )
