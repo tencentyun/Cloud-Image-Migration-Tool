@@ -60,13 +60,13 @@ class BaseJobManager(object):
             self.db_cursor.execute("INSERT INTO metadata VALUES ('last_selected', '0')")
         self.db_connect.commit()
 
-        if "advanced" in config and "fileid.ignore_if" in config["advanced"]:
-            self.fileid_ignore_if = re.compile(config["advanced"]["fileid.ignore_if"])
+        if "advanced" in config and "fileid.ignore.if" in config["advanced"]:
+            self.fileid_ignore_if = re.compile(config["advanced"]["fileid.ignore.if"])
         else:
             self.fileid_ignore_if = None
 
-        if "advanced" in config and "fileid.ignore_unless" in config["advanced"]:
-            self.fileid_ignore_unless = re.compile(config["advanced"]["fileid.ignore_unless"])
+        if "advanced" in config and "fileid.ignore.unless" in config["advanced"]:
+            self.fileid_ignore_unless = re.compile(config["advanced"]["fileid.ignore.unless"])
         else:
             self.fileid_ignore_unless = None
 
@@ -89,17 +89,17 @@ class BaseJobManager(object):
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 
-        if "advanced" in config and "fileid.ignore_if" in config["advanced"]:
+        if "advanced" in config and "fileid.ignore.if" in config["advanced"]:
             try:
-                re.compile(config["advanced"]["fileid.ignore_if"])
+                re.compile(config["advanced"]["fileid.ignore.if"])
             except re.error:
-                return "Error: Regex syntax error for Advanced.fileid.ignore_if. "
+                return "Error: Regex syntax error for Advanced.fileid.ignore.if. "
 
-        if "advanced" in config and "fileid.ignore_unless" in config["advanced"]:
+        if "advanced" in config and "fileid.ignore.unless" in config["advanced"]:
             try:
-                re.compile(config["advanced"]["fileid.ignore_unless"])
+                re.compile(config["advanced"]["fileid.ignore.unless"])
             except re.error:
-                return "Error: Regex syntax error for Advanced.fileid.ignore_unless. "
+                return "Error: Regex syntax error for Advanced.fileid.ignore.unless. "
 
 
     def submit(self, fileid, src):
