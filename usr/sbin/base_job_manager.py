@@ -52,14 +52,11 @@ class BaseJobManager(object):
                     key TEXT PRIMARY KEY NOT NULL, 
                     value TEXT)
                 """)
-            self.db_cursor.execute(
-                """INSERT INTO metadata VALUES 
-                    ('submitted', '0'),
-                    ('successful', '0'),
-                    ('failed', '0'),
-                    ('last_selected', '0')
-                """)
-
+            # compound INSERT is not supported before SQLite 3.7.11
+            self.db_cursor.execute("INSERT INTO metadata VALUES ('submitted', '0')")
+            self.db_cursor.execute("INSERT INTO metadata VALUES ('successful', '0')")
+            self.db_cursor.execute("INSERT INTO metadata VALUES ('failed', '0')")
+            self.db_cursor.execute("INSERT INTO metadata VALUES ('last_selected', '0')")
         self.db_connect.commit()
 
         self.new_submitted = 0
