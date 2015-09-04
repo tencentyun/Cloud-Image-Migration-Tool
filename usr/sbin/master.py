@@ -120,13 +120,24 @@ class Master(object):
 
             self.slaves.append(slave)
 
-    def write_log(self, (serial, fileid, status, log)):
+    def write_log(self, (serial, fileid, old_status, status, log)):
         self.db_cursor.execute(
             "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
         )
 
-        self.db_cursor.execute(
-            "UPDATE metadata SET value = value + 1 WHERE key = ?", ("successful" if status == 1 else "failed",)
+        if status == 1 and old_status == 0:
+            update_values = [ (1, "successful") ]
+        elif status == 1 and old_status == 2:
+            update_values = [ (1, "successful"), (-1, "failed") ]
+        elif status == 2 and old_status == 0:
+            update_values = [ (1, "failed") ]
+        elif status == 2 and old_status == 2:
+            update_values = [ ]
+        else:
+            print("Error: should not happen")
+
+        self.db_cursor.executemany(
+            "UPDATE metadata SET value = value + ? WHERE key = ?", update_values
         )
 
         if self.db_last_commit + self.db_commit_interval < time.time():
@@ -138,10 +149,10 @@ class Master(object):
         if self.no_more_jobs: return
 
         self.db_cursor.execute(
-            """SELECT serial, fileid, src, log
+            """SELECT serial, fileid, status, src, log
                 FROM jobs 
                 WHERE status <> 1 AND 
-                      serial > (SELECT value FROM metadata WHERE key == 'last_selected') 
+                      serial > (SELECT value FROM metadata WHERE key = 'last_selected') 
                 ORDER BY serial 
                 LIMIT ?""", (self.job_queue_buffer_max_size,)
         )
@@ -149,7 +160,7 @@ class Master(object):
         last_selected = None
         for job in self.db_cursor.fetchall():
             job_serial = job[0]
-            job_log = job[3]
+            job_log = job[4]
             job_info = job[: -1]
 
             if self.ignore_error_if and job_log and self.ignore_error_if.match(job_log):

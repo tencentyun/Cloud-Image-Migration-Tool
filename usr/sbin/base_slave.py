@@ -26,8 +26,8 @@ class BaseSlave(object):
     @abc.abstractmethod
     def do_job(self, job):
         """
-        type job: (index, fileid, source)
-        rtype: (index, new fileid, status, log)
+        type job: (index, fileid, old_status, source)
+        rtype: (index, new fileid, old_status, new_status, log)
         
         do not throw any exception
         """

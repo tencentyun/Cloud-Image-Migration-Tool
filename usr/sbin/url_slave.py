@@ -24,14 +24,16 @@ class URLSlave(BaseSlave):
     # implementation of abstract method
     def do_job(self, job):
         """
-        type job: (index, fileid, source)
-        rtype: (index, new fileid, status, log)
+        type job: (index, fileid, old_status, source)
+        rtype: (index, new fileid, old_status, new_status, log)
         
         do not throw any exception
         """
+ 
         serial = job[0]
         fileid = job[1]
-        src = job[2].split("\t")
+        old_status = job[2]
+        src = job[3].split("\t")
 
         url = src[0]
         referer = src[1] if len(src) > 1 else None
@@ -65,5 +67,5 @@ class URLSlave(BaseSlave):
         else:
             new_fileid = fileid
 
-        return (serial, new_fileid, status, log)
+        return (serial, new_fileid, old_status, status, log)
 
