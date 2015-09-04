@@ -105,6 +105,10 @@ class Master(object):
             except re.error:
                 return "Error: Regex syntax error for Advanced.error.ignore.if. "
 
+        db_path = config["paths"]["job_db_path"]
+        if not os.path.isfile(db_path):
+            return "Error: Job database %s is not regular file. " % db_path
+
     def create_slaves(self):
         num_slaves = int(self.config["toolconfig"]["concurrency"])
         self.slaves = []
