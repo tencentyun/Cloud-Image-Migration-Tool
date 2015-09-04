@@ -124,6 +124,7 @@ if __name__ == "__main__":
     config["paths"]["conf_path"] = conf_path
     config["paths"]["log_path"] = log_path
     config["paths"]["job_db_path"] = os.path.join(log_path, "jobs.db")
+    config["paths"]["pid_path"] = os.path.join(log_path, "pid")
 
     # check configurations
     check_result = check_config(config)
@@ -132,6 +133,10 @@ if __name__ == "__main__":
         exit(1)
     else:
         (job_manager_class, slave_class, uploader_class) = check_result
+
+    pid_path = config["paths"]["pid_path"]
+    with open(pid_path, "w") as pid:
+        pid.write(str(os.getpid()))
 
     if task == 0:
         # submit procedure
@@ -144,3 +149,6 @@ if __name__ == "__main__":
         # upload procedure
         master = Master(config, slave_class, uploader_class)
         master.start()
+
+    if os.path.isfile(pid_path):
+        os.remove(pid_path)
