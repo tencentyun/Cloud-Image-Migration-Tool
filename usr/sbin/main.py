@@ -106,7 +106,7 @@ if __name__ == "__main__":
     else:
         (lib_path, conf_path, log_path) = check_result
 
-    # non-builtin modules mustn't be imported before statement
+    # non-builtin modules mustn't be imported before this statement
     sys.path.insert(0, lib_path)
 
     # load configurations
