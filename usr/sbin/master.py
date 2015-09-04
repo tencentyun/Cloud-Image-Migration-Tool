@@ -222,7 +222,6 @@ class Master(object):
                 if num_quit == len(self.slaves):
                     break
             else:
-                print(log[0], "l")
                 self.write_log(log)
             self.job_queue_size -= 1
 
