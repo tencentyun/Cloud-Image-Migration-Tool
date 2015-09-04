@@ -19,12 +19,13 @@ def import_libs():
     from civ2_uploader import CloudImageV2Uploader
 
 def check_args(argv):
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 5:
         return "Error: Command line arguments error. Please view source code for help. "
     
     lib_path = str(argv[1])
     conf_path = str(argv[2])
     log_path = str(argv[3])
+    task = str(argv[4])
 
     if not os.path.isabs(conf_path):
         return "Error: Configuration path %s is not absolute path. " % conf_path
@@ -44,8 +45,15 @@ def check_args(argv):
     if not os.path.isdir(log_path):
         return "Error: Log path %s is not directory or not exists. " % log_path
 
+    if task != "submit" and task != "upload":
+        return "Error: Invalid task. "
 
-    return (lib_path, conf_path, log_path)
+    task = { "submit": 0,
+             "upload": 1,
+           }[task]
+
+
+    return (lib_path, conf_path, log_path, task)
 
 def check_config(config):
     import_libs()
@@ -95,7 +103,7 @@ def check_config(config):
     
     return (job_manager_class, slave_class, uploader_class)
 
-# command line arguments: lib_path conf_path log_path
+# command line arguments: lib_path conf_path log_path task
 if __name__ == "__main__":
 
     # check command line arguments
@@ -104,7 +112,7 @@ if __name__ == "__main__":
         print(check_result)
         exit(1)
     else:
-        (lib_path, conf_path, log_path) = check_result
+        (lib_path, conf_path, log_path, task) = check_result
 
     # non-builtin modules mustn't be imported before this statement
     sys.path.insert(0, lib_path)
@@ -125,13 +133,14 @@ if __name__ == "__main__":
     else:
         (job_manager_class, slave_class, uploader_class) = check_result
 
-    # submit procedure
-    #job_manager = job_manager_class(config)
-    #job_manager.do()
-    #print("New submitted: %d" % job_manager.new_submitted)
-    #print("Submit failed: %d" % job_manager.submit_error)
-    #print("Ignored: %d" % job_manager.ignore)
-    
-    # upload procedure
-    master = Master(config, slave_class, uploader_class)
-    master.start()
+    if task == 0:
+        # submit procedure
+        job_manager = job_manager_class(config)
+        job_manager.do()
+        print("New submitted: %d" % job_manager.new_submitted)
+        print("Submit failed: %d" % job_manager.submit_error)
+        print("Ignored: %d" % job_manager.ignore)
+    elif task == 1: 
+        # upload procedure
+        master = Master(config, slave_class, uploader_class)
+        master.start()
