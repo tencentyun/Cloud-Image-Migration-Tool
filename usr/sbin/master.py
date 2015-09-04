@@ -188,6 +188,10 @@ class Master(object):
             self.job_queue_size += 1
 
     def start(self):
+        if not os.path.isfile(self.config["paths"]["job_db_path"]):
+            print("Job database not found, nothing to do. ")
+            return
+
         def interrupt_subprocesses(signum, frame):
             for process in self.slaves:
                 os.kill(process.pid, signal.SIGINT)
