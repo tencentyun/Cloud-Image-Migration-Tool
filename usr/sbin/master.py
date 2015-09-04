@@ -188,7 +188,11 @@ class Master(object):
             self.job_queue_size += 1
 
     def start(self):
-        signal.signal(signal.SIGINT, lambda signum, frame: None)        
+        def interrupt_subprocesses(signum, frame):
+            for process in self.slaves:
+                os.kill(process.pid, signal.SIGINT)
+
+        signal.signal(signal.SIGINT, interrupt_subprocesses)
 
         self.create_slaves()
 
