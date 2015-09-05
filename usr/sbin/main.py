@@ -59,7 +59,7 @@ def check_config(config):
     import_libs()
 
     derived_classes = { 
-        "1": (LocalFSJobManager, URLSlave, CloudImageV2Uploader),
+        "Local": (LocalFSJobManager, URLSlave, CloudImageV2Uploader),
                       }
 
     # check config for base job manager
