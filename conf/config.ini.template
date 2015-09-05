@@ -1,0 +1,70 @@
+; modify this template configuration file and rename it to config.ini
+; section names and property names are case insensitive
+
+[MigrateInfo]
+; Local | URLList | Qiniu
+migrate.type = Local
+
+[Local]
+; must be absolute path
+local.image_root_path = /root/images/
+
+[URLList]
+; must be absolute path
+; must be unencoded URLs
+url.url_list_file_path = /root/urllist
+
+[Qiniu]
+qiniu.bucket = my_bucket_name
+qiniu.AccessKey = _17terLxP-ZK7tma9jXgm7MuEOk72yP9OZBIP35G
+qiniu.SecretKey = PFw6JivhTAdNKRojaguUkC6tlFHAI9SBrjVYdfya
+; domain should start with http end up with "/"
+qiniu.domain = http://aaaaa.glb.clouddn.com/
+; should start with http, leave it blank if none
+qiniu.referer = 
+; 1 or ture on this bucket is private
+qiniu.isprivate = False
+
+[AppInfo]
+appinfo.appid = 10000000
+appinfo.secretID = AKIDgRmc3zz5pKK8MdfLV7ZOM6KkBNifozMG
+appinfo.secretKey = 2wUid99BjpOyL7VVDSEhPmW8xcUvuHEv
+appinfo.bucket = my_bucket
+
+[ToolConfig]
+; number of uploading processes
+concurrency = 10
+
+; job queue capacity, this value is limited by OS
+; do not set it more than 32767 on Unix-like OS unless u know clearly what u r doing
+jobqueue.capacity = 2000
+
+; reload job queue when less than this percentage
+jobqueue.reload.threshold = 0.4
+
+; A larger buffer will perform faster but consume more memory
+buffer.size = 100000
+
+; interval (in seconds) of commiting logs to db
+; if process is killed by signals except SIGINT, uncommited logs will be lost
+; set the interval too short will significantly degrade performance
+db.commit.interval = 3
+
+[Paths]
+; Do Not add any options in this section
+
+[Advanced]
+; ignore all jobs with fileid (not) matching this regex
+; please consult to Python's re module documentation for syntax
+; if some fileid mathes both regexes, it will be ignored
+fileid.ignore.if = .*.DS_Store
+fileid.ignore.unless = (?i).*\.(?:jpg|jpeg|gif|bmp|png|webp|tiff)$
+
+; failed job won't be retried if its log matching this regex
+error.ignore.if = .*code: -1886.*
+
+; options below are for customized users
+; they may be removed in a future version
+; don't touch if u don't know what u are doing
+fileid.ignore.execute = 
+
