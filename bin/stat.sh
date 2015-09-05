@@ -3,7 +3,7 @@
 . $(dirname $0)/env.sh
 
 sqlite3 ${LOG_PATH}/jobs.db \
-'select key,value from metadata where key = "submitted" or key = "successful" or key = "failed";' |\
+'SELECT key,value FROM metadata WHERE key = "submitted" OR key = "successful" OR key = "failed";' |\
 awk -F\| ' \
 BEGIN { \
     submitted = 0; \
