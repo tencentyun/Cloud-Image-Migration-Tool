@@ -70,6 +70,12 @@ class BaseJobManager(object):
         else:
             self.fileid_ignore_unless = None
 
+        if "advanced" in config and "fileid.ignore.execute" in config["advanced"]:
+            execute_codes = config["advanced"]["fileid.ignore.execute"].decode("string_escape")
+            self.fileid_ignore_execute = compile(execute_codes, "<string>", "exec")
+        else:
+            self.fileid_ignore_execute = None
+
         self.new_submitted = 0
         self.ignore = 0
         self.submit_error = 0
@@ -101,6 +107,13 @@ class BaseJobManager(object):
             except re.error:
                 return "Error: Regex syntax error for Advanced.fileid.ignore.unless. "
 
+        if "advanced" in config and "fileid.ignore.execute" in config["advanced"]:
+            execute_codes = config["advanced"]["fileid.ignore.execute"].decode("string_escape")
+            try:
+                compile(execute_codes, "<string>", "exec")
+            except SyntaxError as e:
+                return "Error: Syntax error in Advanced.fileid.ignore.execute, %s. " % execute_codes
+
 
     def submit(self, fileid, src):
         if self.fileid_ignore_if and self.fileid_ignore_if.match(fileid):
@@ -109,6 +122,26 @@ class BaseJobManager(object):
         if self.fileid_ignore_unless and not self.fileid_ignore_unless.match(fileid):
             self.ignore += 1
             return
+
+        # You can give a custom function to determine whether or not to 
+        # ignore this job according to the original fileid and source
+        # you can also modify the original fileid or source
+        # variables available: 
+        #   input: fileid: original fileid
+        #          src: original source    
+        #   output: fileid: new fileid
+        #           src: new source
+        #           ignore: ignore this job if this is True
+        def custom_fileid_ignore_func(fileid, src, codes):
+            ns = { "fileid": fileid, "src": src, "ignore": False }
+            exec codes in ns
+            return (ns["fileid"], ns["src"], ns["ignore"])
+
+        if self.fileid_ignore_execute:
+            (fileid, src, ignore) = custom_fileid_ignore_func(fileid, src, self.fileid_ignore_execute)
+            if ignore:
+                self.ignore += 1
+                return
          
         try:
             self.db_cursor.execute(
