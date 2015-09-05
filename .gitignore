@@ -4,6 +4,10 @@
 # vim
 *.swp
 
-
 # Python
 *.pyc
+
+# used for test
+log/
+TODO
+conf/config.ini

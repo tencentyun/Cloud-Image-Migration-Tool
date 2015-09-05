@@ -39,8 +39,7 @@ class URLSlave(BaseSlave):
         referer = src[1] if len(src) > 1 else None
         
         # read source
-        # TODO: test for file: ftp: http: https:
-        # TODO: redirection
+        # TODO: what if redirection
         status, log = None, None
         try:
             # encode URL
