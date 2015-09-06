@@ -18,6 +18,8 @@ from base_uploader import BaseUploader
 def import_libs():
     global CloudImageV2Uploader  
     from civ2_uploader import CloudImageV2Uploader
+    global QiniuJobManager
+    from qiniu_job_manager import QiniuJobManager
 
 def check_args(argv):
     if len(sys.argv) < 5:
@@ -62,6 +64,7 @@ def check_config(config):
     derived_classes = { 
         "Local": (LocalFSJobManager, URLSlave, CloudImageV2Uploader),
         "URLList": (URLListJobManager, URLSlave, CloudImageV2Uploader),
+        "Qiniu": (QiniuJobManager, URLSlave, CloudImageV2Uploader),
                       }
 
     # check config for base job manager
