@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-
 from base_job_manager import BaseJobManager
 
 import os
@@ -22,8 +20,8 @@ class LocalFSJobManager(BaseJobManager):
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 
-        if not os.path.isabs(os.path.expanduser(config["local"]["local.image_root_path"])):
-            return "Error: Image root path %s is not absolute path. " % os.path.expanduser(config["local"]["local.image_root_path"])
+        if not os.path.isabs(config["local"]["local.image_root_path"]):
+            return "Error: Image root path %s is not absolute path. " % config["local"]["local.image_root_path"]
 
         if not os.path.isdir(config["local"]["local.image_root_path"]):
             return "Error: Image root path %s is not directory. " % config["local"]["local.image_root_path"]
