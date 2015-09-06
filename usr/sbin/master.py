@@ -141,8 +141,11 @@ class Master(object):
         )
 
         if self.db_last_commit + self.db_commit_interval < time.time():
-            self.db_connect.commit()
-            self.db_last_commit = time.time()
+            try:
+                self.db_connect.commit()
+                self.db_last_commit = time.time()
+            except sqlite3.Error:
+                pass 
 
     def load_job(self):
         if self.job_queue_buffer: return
