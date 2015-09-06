@@ -5,7 +5,6 @@ from base_slave import BaseSlave
 import urlparse
 import urllib
 import urllib2
-import platform
 
 class URLSlave(BaseSlave):
     def __init__(self, config, UploaderClass):

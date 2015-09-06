@@ -2,7 +2,6 @@
 
 from base_uploader import BaseUploader
 
-import time
 import tencentyun
 
 class CloudImageV2Uploader(BaseUploader):
