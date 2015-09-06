@@ -8,6 +8,7 @@ from config_loader import ConfigLoader
 from master import Master
 from base_job_manager import BaseJobManager
 from local_fs_job_manager import LocalFSJobManager
+from url_list_job_manager import URLListJobManager
 from base_slave import BaseSlave
 from url_slave import URLSlave
 from base_uploader import BaseUploader
@@ -60,6 +61,7 @@ def check_config(config):
 
     derived_classes = { 
         "Local": (LocalFSJobManager, URLSlave, CloudImageV2Uploader),
+        "URLList": (URLListJobManager, URLSlave, CloudImageV2Uploader),
                       }
 
     # check config for base job manager
