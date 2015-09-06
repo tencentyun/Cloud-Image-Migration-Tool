@@ -12,7 +12,6 @@ class BaseSlave(object):
     mandatory_options = [ ]
 
     def __init__(self, config):
-        self.interrupted = False
         self.config = config
 
     @staticmethod
@@ -34,20 +33,16 @@ class BaseSlave(object):
         pass
 
 
-    def start(self, job_queue, log_queue):
-        def sigint_handler(signum, frame):
-            self.interrupted = True
-        signal.signal(signal.SIGINT, sigint_handler)
-    
+    def start(self, job_queue, log_queue, no_more_jobs):
         while True:
-            if self.interrupted:
-                log_queue.put("quit")
-                break
-
-            job = job_queue.get()
+            if no_more_jobs.value == 1:
+                job = "no more jobs"
+            else:
+                job = job_queue.get()
 
             if job == "no more jobs":
-                self.interrupted = True
+                log_queue.put("quit")
+                break
             else:
                 log_queue.put(self.do_job(job))
 

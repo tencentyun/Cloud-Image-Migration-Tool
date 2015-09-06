@@ -110,11 +110,12 @@ class Master(object):
         self.slaves = []
         self.job_queue = multiprocessing.Queue()
         self.log_queue = multiprocessing.Queue()
+        self.terminate_slaves = multiprocessing.Value("i", 0, lock = False)
 
 
         for _ in range(num_slaves):
             slave_class = self.SlaveClass(self.config, self.UploaderClass)
-            slave = multiprocessing.Process(target = slave_class.start, args = (self.job_queue, self.log_queue))
+            slave = multiprocessing.Process(target = slave_class.start, args = (self.job_queue, self.log_queue, self.terminate_slaves))
             slave.daemon = True
             slave.start()
 
@@ -193,8 +194,7 @@ class Master(object):
             return
 
         def interrupt_subprocesses(signum, frame):
-            for process in self.slaves:
-                os.kill(process.pid, signal.SIGINT)
+            self.terminate_slaves.value = 1
 
         signal.signal(signal.SIGINT, interrupt_subprocesses)
 
