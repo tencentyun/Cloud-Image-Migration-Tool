@@ -52,7 +52,6 @@ class URLSlave(BaseSlave):
         referer = src[1] if len(src) > 1 else None
         
         # read source
-        # TODO: what if redirection
         status, log = None, None
         try:
             # encode URL
@@ -66,7 +65,7 @@ class URLSlave(BaseSlave):
 
             r = urllib2.urlopen(req)
 
-            if r.getcode() is None or 100 <= r.getcode() < 300:
+            if r.getcode() is None or 100 <= r.getcode() < 400:
                 src = r.read()
             else:
                 status = 2
