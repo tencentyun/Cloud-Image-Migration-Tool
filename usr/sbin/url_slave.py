@@ -1,4 +1,18 @@
 #!/usr/bin/env python
+###############################################################################
+ #  Copyright (c) 2015 Tencent Inc.
+ #  Distributed under the MIT license 
+ #  (See accompanying file LICENSE or copy at http://opensource.org/licenses/MIT)
+ #  
+ #  Project: Cloud Image Migration Tool
+ #  Filename: url_slave.py
+ #  Version: 2.0
+ #  Author: Jamis Hoo
+ #  E-mail: hoojamis@gmail.com
+ #  Date: Sep  7, 2015
+ #  Time: 14:29:44
+ #  Description: derived slave for downloading URL
+###############################################################################
 
 from __future__ import print_function
 from base_slave import BaseSlave

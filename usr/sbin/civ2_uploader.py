@@ -1,4 +1,20 @@
 #!/usr/bin/env python
+###############################################################################
+ #  Copyright (c) 2015 Tencent Inc.
+ #  Distributed under the MIT license 
+ #  (See accompanying file LICENSE or copy at http://opensource.org/licenses/MIT)
+ #  
+ #  Project: Cloud Image Migration Tool
+ #  Filename: civ2_uploader.py
+ #  Version: 2.0
+ #  Author: Jamis Hoo
+ #  E-mail: hoojamis@gmail.com
+ #  Date: Sep  7, 2015
+ #  Time: 14:29:44
+ #  Description: derived uploader for Cloud Image v2
+###############################################################################
+
+
 
 from base_uploader import BaseUploader
 
