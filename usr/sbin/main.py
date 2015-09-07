@@ -160,7 +160,7 @@ if __name__ == "__main__":
     if task == 0:
         # submit procedure
         job_manager = job_manager_class(config)
-        job_manager.do()
+        job_manager.start()
         print("New submitted: %d" % job_manager.new_submitted)
         print("Submit failed: %d" % job_manager.submit_error)
         print("Ignored: %d" % job_manager.ignore)
