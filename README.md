@@ -110,6 +110,7 @@ concurrency = 10
 jobqueue.capacity = 2000
 jobqueue.reload.threshold = 0.4
 buffer.size = 100000
+db.commit.interval = 3
 ```
 
 `fileid.ignore.if`使工具在提交任务时忽略file id符合指定条件的任务。
