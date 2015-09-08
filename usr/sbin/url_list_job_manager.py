@@ -34,8 +34,10 @@ class URLListJobManager(BaseJobManager):
                         ]
 
     def __init__(self, config):
+        """
+        Initialize base class.
+        """
         super(URLListJobManager, self).__init__(config)
-
 
     @staticmethod
     def check_config(config):
