@@ -39,14 +39,6 @@ class URLSlave(BaseSlave):
         self.uploader_class = UploaderClass(config)
     
 
-    def openURL(self, url, referer):
-        req = urllib2.Request(url)
-        if referer:
-            req.add_header("Referer", referer)
-        r = urllib2.urlopen(req) 
-
-        return (req.get_code(), r.read())
-
     def do_job(self, job):
         """
         Implementation of abstract method.
