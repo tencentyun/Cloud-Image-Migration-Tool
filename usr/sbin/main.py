@@ -17,6 +17,7 @@ This module is called by shell script.
 In this module, we check command-line arguments, load configurations and check 
 configurations. Then job manager module or master module is called according to
 the configuration to submit jobs or upload jobs.
+Also writes pid log.
 """
 
 from __future__ import print_function
@@ -173,12 +174,6 @@ def check_config(config):
 
 # command line arguments: lib_path conf_path log_path task
 if __name__ == "__main__":
-    """ 
-    This is main function.
-    It writes pid log and call job manager to start submitting jobs, 
-    or call uploader to start uploading.
-    """
-
     # check command line arguments
     check_result = check_args(sys.argv)
     if type(check_result) is str:
