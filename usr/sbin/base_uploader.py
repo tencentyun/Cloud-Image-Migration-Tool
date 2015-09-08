@@ -72,7 +72,7 @@ class BaseUploader(object):
             log: a tuple of (fileid, status, log)
                 fileid: string, new file id of the job, could be same or different 
                     with that in argument
-                status: integer, new status of the job
+                status: integer, new status of the job, 0 -- new submitted, 1 -- successful, 2 -- faled.
                 log: log in string
 
         Raises:
