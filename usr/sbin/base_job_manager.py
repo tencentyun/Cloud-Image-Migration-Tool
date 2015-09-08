@@ -11,7 +11,6 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: base class of job submitting module
 ###############################################################################
 
 import re
@@ -19,6 +18,39 @@ import abc
 import sqlite3
 
 class BaseJobManager(object):
+    """
+    Abstract base class of job manager.
+    This module is only used in the procedure of submitting jobs.
+    It creates database and submit jobs into it.
+
+    Attributes:
+        mandatory_options: Configuration options required by this class. This is
+            a list of tuples which contains two strings, section name and 
+            property name, both of which are case-insensitive.
+
+        config: Copy of configuration
+
+        db_connect: Connecter to sqlite3 database
+
+        db_cursor: Cursor of db_connect
+
+        fileid_ignore_if: Compiled regular expression if Advanced.fileid.ignore.if
+            is provided in config, none otherwise.
+
+        fileid_ignore_unless: Compiled regular expression if Advanced.fileid.ignore.unless
+            is provided in config, none otherwise.
+
+        fileid_ignore_execute: Compiled byte-code if Advanced.fileid.ignore.execute
+            is provided in config, none otherwise.
+
+        exec_namespace: Namespace to execute fileid_ignore_execute byte-code.
+
+        new_submitted: Total number of jobs submitted.
+
+        ignore: Total number of jobs ignored.
+
+        submit_error: Total number jobs failed when submitting.
+    """
     __metaclass__ = abc.ABCMeta
 
     mandatory_options = [
@@ -27,6 +59,13 @@ class BaseJobManager(object):
                         ]
 
     def __init__(self, config):
+        """
+        Create (if not exists) and open database, initialize other attributes.
+        
+        Args:
+            config: configuration dict.
+
+        """
         self.config = config
 
         db_path = config["paths"]["job_db_path"]
@@ -98,10 +137,28 @@ class BaseJobManager(object):
 
 
     def __del__(self):
+        """
+        Close the database.
+        The submitting procedure should be atomic. That is, all or none of the 
+        jobs should be submitted into database. So we shouldn't call commit in
+        this function.
+        """
         self.db_connect.close()
 
     @staticmethod
     def check_config(config):
+        """
+        Check whether all required options are provided. 
+        Also check the validity of some options.
+
+        Args:
+            config: configuration dict
+
+        Returns:
+            Returns string containing error message if there are some errors.
+            Returns none otherwise.
+        """
+
         for section, option in BaseJobManager.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
@@ -127,6 +184,22 @@ class BaseJobManager(object):
 
 
     def submit(self, fileid, src):
+        """
+        Accept a job identified by file id and src, determine whether this job 
+        should be ignored, submit it to database and update counters (num_submitted, 
+        submit_error, ignore).
+
+        Args:
+            fileid: File id of the job. This should be unique among all jobs or 
+                set it none.
+            src: Source of this job. This can be a URL or a local filename or 
+                identifier of a resource in any other forms that can be 
+                recognized by slave.
+
+        Returns: Returns none.
+        """
+
+
         if self.fileid_ignore_if and self.fileid_ignore_if.match(fileid):
             self.ignore += 1
             return
@@ -170,9 +243,21 @@ class BaseJobManager(object):
 
     @abc.abstractmethod
     def do(self):
+        """
+        Interface which should be implemented in derived class.
+        This function should submit some jobs by calling submit().
+        DO NOT raise exceptions other than KeyboardInterrupt.
+        """
         pass
 
     def start(self):
+        """
+        Start submitting jobs.
+        This function will call do(), which should be implemented in derived 
+        class. Submitted jobs will be commited to database only if do() normally
+        returns.
+
+        """
         try:
             self.do()
             self.db_cursor.execute(
