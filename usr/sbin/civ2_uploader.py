@@ -11,16 +11,23 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: derived uploader for Cloud Image v2
 ###############################################################################
-
-
 
 from base_uploader import BaseUploader
 
 import tencentyun
 
 class CloudImageV2Uploader(BaseUploader):
+    """
+    Derived class of BaseUploader.
+    Uploads data to Cloud Image (http://www.qcloud.com/product/ci.html) V2.
+
+    Attributes:
+        mandatory_options: Configuration options required by this class. This is
+            a list of tuples each of which contains two strings, section name and 
+            property name, both of which are case-insensitive.
+    """
+
     mandatory_options = [
         ("appinfo", "appinfo.appid"),
         ("appinfo", "appinfo.bucket"),
@@ -29,6 +36,9 @@ class CloudImageV2Uploader(BaseUploader):
                         ]
 
     def __init__(self, config):
+        """
+        Initialize base class and configurations.
+        """
         super(CloudImageV2Uploader, self).__init__(config)
         self.appid = config["appinfo"]["appinfo.appid"]
         self.bucket = config["appinfo"]["appinfo.bucket"]
@@ -38,17 +48,40 @@ class CloudImageV2Uploader(BaseUploader):
     
     @staticmethod
     def check_config(config):
+        """
+        Check whether all required options are provided. 
+        Also check the validity of some options.
+
+        Args:
+            config: configuration dict
+
+        Returns:
+            Returns string containing error message if there are some errors.
+            Returns none otherwise.
+        """
+ 
         for section, option in CloudImageV2Uploader.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
 
-    # implementation of abstract method
     def upload(self, job):
         """
-        type job: (fileid, source)
-        rtype: (new fileid, status, log)
+        Implementation of abstract method.
+        Upload this image to Cloud Image V2 via its SDK.
 
-        do not throw any exception
+        Args:
+            job: a tuple of (fileid, source)
+                fileid: string, file id of this job
+                source: string, binary data of an image
+
+        Returns: 
+            log: a tuple of (fileid, status, log)
+                fileid: string, the same with that in argument
+                status: integer, new status of the job
+                log: log in string
+
+        Raises:
+            DO NOT raise any exception in this function.
         """
         fileid = job[0]
         source = job[1]
