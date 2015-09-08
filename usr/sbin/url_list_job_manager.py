@@ -11,7 +11,6 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: derived job manager for url list
 ###############################################################################
 
 from base_job_manager import BaseJobManager
@@ -20,6 +19,16 @@ import os
 import urlparse
 
 class URLListJobManager(BaseJobManager):
+    """
+    Derived class of BaseJobManager.
+    Traverse a file consisting of a list of ULRs, one per line.
+
+    Attributes:
+        mandatory_options: Configuration options required by this class. This is
+            a list of tuples each of which contains two strings, section name and 
+            property name, both of which are case-insensitive.
+    """
+
     mandatory_options = [
         ("urllist", "url.url_list_file_path"),
                         ]
@@ -30,6 +39,18 @@ class URLListJobManager(BaseJobManager):
 
     @staticmethod
     def check_config(config):
+        """
+        Check whether all required options are provided. 
+        Also check the validity of some options.
+
+        Args:
+            config: configuration dict
+
+        Returns:
+            Returns string containing error message if there are some errors.
+            Returns none otherwise.
+        """
+ 
         for section, option in URLListJobManager.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
@@ -42,6 +63,12 @@ class URLListJobManager(BaseJobManager):
 
     # implementation of abstract method
     def do(self):
+        """
+        Implementation of abstract method.
+        Traverse a file consisting of a list of URLs and submit each URL, with
+        path component of the URL as file id of the job and the whole URL as src.
+        """
+
         file_handler = open(self.config["urllist"]["url.url_list_file_path"])
 
         for line in file_handler:
