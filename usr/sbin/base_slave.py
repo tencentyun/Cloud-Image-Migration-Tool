@@ -105,6 +105,13 @@ class BaseSlave(object):
         should be implemented in derived class. 
         Put what do_job() function returns to log queue.
 
+        Attributes:
+            job_queue: Queue used to distribute jobs to slaves. Master process puts
+                jobs into this queue and slaves fetch jobs from here.
+
+            log_queue: Queue used to gather logs from slaves to master. Slave processes 
+                put logs into this queue and master process fetches logs from here.
+
         """
         def sigint_handler(signum, frame):
             self.interrupted = True
