@@ -11,7 +11,6 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: derived job manager for Qiniu
 ###############################################################################
 
 from base_job_manager import BaseJobManager
@@ -21,6 +20,17 @@ import urlparse
 import qiniu
 
 class QiniuJobManager(BaseJobManager):
+    """
+    Derived class of BaseJobManager.
+    Traverse a Qiniu account.
+
+    Attributes:
+        mandatory_options: Configuration options required by this class. This is
+            a list of tuples each of which contains two strings, section name and 
+            property name, both of which are case-insensitive.
+    """
+
+
     mandatory_options = [
         ("qiniu", "qiniu.accesskey"),
         ("qiniu", "qiniu.secretkey"),
@@ -31,6 +41,18 @@ class QiniuJobManager(BaseJobManager):
 
     @staticmethod
     def check_config(config):
+        """
+        Check whether all required options are provided. 
+        Also check the validity of some options.
+
+        Args:
+            config: configuration dict
+
+        Returns:
+            Returns string containing error message if there are some errors.
+            Returns none otherwise.
+        """
+ 
         for section, option in QiniuJobManager.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
@@ -39,6 +61,15 @@ class QiniuJobManager(BaseJobManager):
             return "Error: Invalid Qiniu.qiniu.isprivate. "
 
     def do(self):
+        """
+        Implementation of abstract method.
+        Traverse a Qiniu account and submit each file.
+        File id of the job is key of the Qiniu file.
+        Src is download URL of the resource. 
+        If resource requires a referer to download, the referer is also included
+        in src, which is seperated by a tab with download URL.
+        """
+
         access_key = self.config["qiniu"]["qiniu.accesskey"]
         secret_key = self.config["qiniu"]["qiniu.secretkey"]
         bucket_name = self.config["qiniu"]["qiniu.bucket"]
