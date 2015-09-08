@@ -327,13 +327,13 @@ class Master(object):
         self.job_queue_max_size = int(self.config["toolconfig"]["jobqueue.capacity"])
         self.job_queue_buffer = deque()
         self.job_queue_buffer_max_size = int(self.config["toolconfig"]["buffer.size"])
-        self.job_queue.reload_size = self.job_queue_max_size * float(self.config["toolconfig"]["jobqueue.reload.threshold"])
+        self.job_queue_reload_size = self.job_queue_max_size * float(self.config["toolconfig"]["jobqueue.reload.threshold"])
 
         num_quit = 0
         
         while True:
             # fill job queue
-            if self.job_queue_size < self.job_queue.reload_size:
+            if self.job_queue_size < self.job_queue_reload_size:
                 self.fill_job_queue() 
             # fetch a log
             log = self.log_queue.get()
