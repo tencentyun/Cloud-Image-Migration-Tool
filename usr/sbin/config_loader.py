@@ -11,7 +11,6 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: load ini config
 ###############################################################################
 
 import ConfigParser
@@ -19,6 +18,18 @@ import ConfigParser
 class ConfigLoader(object):
     @staticmethod
     def load(filename):
+        """
+        Load file configuration into a second-level nested dict.
+
+        Args:
+            filename: Filename of the config file
+
+        Returns:
+            result: A second-level nested dict. The outer dict maps section 
+                name to a inner dict. The inner dict maps property name to 
+                property value.
+
+        """
         config = ConfigParser.ConfigParser()
         config.read(filename)
 
