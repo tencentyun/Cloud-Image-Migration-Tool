@@ -296,6 +296,7 @@ class Master(object):
         Fill job_queue from job_queue_buffer.
         Fill buffer if buffer is clear.
         """
+        print("fill job queue")
         for _ in range(self.job_queue_max_size - self.job_queue_size):
             if not self.job_queue_buffer:
                 self.load_job()
@@ -351,8 +352,6 @@ class Master(object):
         # If slaves is terminated, there are still jobs in job queue which should
         # be discarded.
         self.job_queue.cancel_join_thread()
-        # TODO
-        self.log_queue.cancel_join_thread()
 
         for slave in self.slaves:
             slave.join()
