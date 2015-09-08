@@ -11,10 +11,7 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: master process
 ###############################################################################
-
-
 
 from __future__ import print_function
 import os
@@ -27,6 +24,62 @@ import sqlite3
 from collections import deque
 
 class Master(object):
+    """
+    This module is only used in uploading procedure.
+    This is the master process who controls uploading procedure.
+    This process creates slave processes, loads jobs from database, distributes
+    jobs to slaves, gathers logs from slaves and write logs to database.
+
+    Attributes:
+        mandatory_options: Configuration options required by this class. This is
+            a list of tuples each of which contains two strings, section name and 
+            property name, both of which are case-insensitive.
+
+        config: Copy of configuration
+
+        SlaveClass: Slave class type
+ 
+        UploaderClass: Uploader class type
+
+        db_connect: Connecter to sqlite3 database
+
+        db_cursor: Cursor of db_connect
+        
+        ignore_error_if: Compiled regex expression if Advanced.error.ignore.if is
+            provided in config, none otherwise.
+
+        no_more_jobs: Boolean value, indicates whether there're undone jobs in database.
+
+        db_commit_interval: Interval of committing logs to database. Uncommited 
+            log will be lost if program is killed.
+
+        db_last_commit: POSIX time the last commit to database
+
+        slaves: All slave process objects.
+
+        log_queue: Queue used to gather logs from slaves to master. Slave processes 
+            put logs into this queue and master process fetches logs from this queue.
+
+        job_queue: Queue used to distribute jobs to slaves. Master process puts
+            jobs into this queue and slaves fetch jobs from it.
+
+        job_queue_size: Current total number of elements in job queue and log queue.
+
+        job_queue_max_size: Capacity of job_queue and log_queue. Number of elements
+            in job queue, number of elements in log queue and number of elements 
+            int both cannot exceed this value. This is usually used to prevent 
+            backlog in log queue.
+
+        job_queue_reload_size: Fill job_queue from job_queue_buffer when number 
+            of elements in job_queue is less than this value.
+
+        job_queue_buffer: Retrieve a centain amount of jobs from database to this
+            buffer every time making a SQL SELECT query. This is used to avoid 
+            frequent SQL queries.
+
+        job_queue_buffer_max_size: Maximum size of job_queue_buffer. This is used
+            to control memory usage.
+    """
 
     mandatory_options = [
         ("paths", "job_db_path"),
@@ -38,6 +91,9 @@ class Master(object):
                         ]
     
     def __init__(self, config, SlaveClass, UploaderClass):
+        """
+        Initialize some attributes. 
+        """
         self.config = config
         self.SlaveClass = SlaveClass
         self.UploaderClass = UploaderClass
@@ -56,6 +112,9 @@ class Master(object):
     # http://bugs.python.org/issue9405
     # http://bugs.python.org/issue13829
     def init_db(self):
+        """
+        Initialize database. 
+        """
         db_path = self.config["paths"]["job_db_path"]
 
         self.db_connect = sqlite3.connect(db_path)
@@ -82,12 +141,26 @@ class Master(object):
         self.db_last_commit = 0
 
     def __del__(self):
+        """
+        Commit transaction and close database.
+        """
         if self.db_connect:
             self.db_connect.commit()
             self.db_connect.close()
 
     @staticmethod
     def check_config(config):
+        """
+        Check whether all required options are provided. 
+        Also check the validity of some options.
+
+        Args:
+            config: configuration dict
+
+        Returns:
+            Returns string containing error message if there are some errors.
+            Returns none otherwise.
+        """
         for section, option in Master.mandatory_options:
             if section not in config or option not in config[section]:
                 return "Error: Option %s.%s is required. " % (section, option)
@@ -122,6 +195,9 @@ class Master(object):
                 return "Error: Regex syntax error for Advanced.error.ignore.if. "
 
     def create_slaves(self):
+        """
+        Create slave processes.
+        """
         num_slaves = int(self.config["toolconfig"]["concurrency"])
         self.slaves = []
         self.job_queue = multiprocessing.Queue()
@@ -137,6 +213,20 @@ class Master(object):
             self.slaves.append(slave)
 
     def write_log(self, (serial, fileid, old_status, status, log)):
+        """
+        Write log of finished job to database.
+        Update metadata.
+        Commit transaction if needed.
+        
+        Args:
+            log: a tuple of (index, fileid, old_status, new_status, log)
+                index: integer, serial number of this job
+                fileid: string, new fileid of this job
+                old_status: integer, old status of this job
+                new_status: integer, new status of the job
+                log: log in string
+
+        """
         self.db_cursor.execute(
             "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
         )
@@ -164,6 +254,10 @@ class Master(object):
                 pass 
 
     def load_job(self):
+        """
+        Load jobs from database to job_queue_buffer.
+        """
+
         if self.job_queue_buffer: return
         if self.no_more_jobs: return
 
@@ -198,6 +292,10 @@ class Master(object):
 
 
     def fill_job_queue(self):
+        """
+        Fill job_queue from job_queue_buffer.
+        Fill buffer if buffer is clear.
+        """
         for _ in range(self.job_queue_max_size - self.job_queue_size):
             if not self.job_queue_buffer:
                 self.load_job()
@@ -207,6 +305,10 @@ class Master(object):
             self.job_queue_size += 1
 
     def start(self):
+        """ 
+        Start uploading procedure.
+        Create slaves, distribute jobs and gather logs.
+        """
         if not os.path.isfile(self.config["paths"]["job_db_path"]):
             print("Job database not found, nothing to do. ")
             return
@@ -246,7 +348,10 @@ class Master(object):
 
         self.db_connect.commit()
 
+        # If slaves is terminated, there are still jobs in job queue which should
+        # be discarded.
         self.job_queue.cancel_join_thread()
+        # TODO
         self.log_queue.cancel_join_thread()
 
         for slave in self.slaves:
