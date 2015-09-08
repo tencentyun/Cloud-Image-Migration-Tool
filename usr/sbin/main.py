@@ -11,8 +11,13 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: main
 ###############################################################################
+"""
+This module is called by shell script.
+In this module, we check command-line arguments, load configurations and check 
+configurations. Then job manager module or master module is called according to
+the configuration to submit jobs or upload jobs.
+"""
 
 from __future__ import print_function
 import os
@@ -28,14 +33,37 @@ from url_slave import URLSlave
 from base_uploader import BaseUploader
 
 
-# import non-builtin modules or modules contain non-builtin modules here
 def import_libs():
+    """
+    Import non-builtin modules or modules contain non-builtin modules.
+
+    Args: None
+        
+    Returns: Returns nothing
+    """
     global CloudImageV2Uploader  
     from civ2_uploader import CloudImageV2Uploader
     global QiniuJobManager
     from qiniu_job_manager import QiniuJobManager
 
 def check_args(argv):
+    """
+    Check command-line arguments passed to this module.
+    
+    Args:
+        argv: A list of command-line arguments
+    
+    Returns:
+        Returns a string containing error message if there are errors in 
+        command-line arguments.
+
+        Otherwise returns a tuple consisting of three strings and an integer.
+            (lib_path, conf_path, log_path, task)
+            lib_path: Absolute path of modules integrated in this tool
+            conf_path: Absolute path of configuration file
+            log_path: Absolute path of log
+            task: integer 0 if submitting jobs, 1 if uploading jobs
+    """
     if len(sys.argv) < 5:
         return "Error: Command line arguments error. Please view source code for help. "
     
@@ -73,6 +101,28 @@ def check_args(argv):
     return (lib_path, conf_path, log_path, task)
 
 def check_config(config):
+    """
+    Check configurations in config.ini.
+
+    Args:
+        config: A dict whose key is section name of config file, and value is 
+            another dict. The secondary dict's key is property name and value is
+            property value.
+
+    Returns:
+        Returns a string containing error message if there are errors in
+        configuration.
+
+        Otherwise returns a tuple consisting of three derived class.
+            (job_manager_class, slave_class, uploader_class)
+            job_manager_class: Derived class of BaseJobManager. It determines 
+                file id and source of jobs.
+            slave_class: Derived class of BaseSlave. It retrieves resources 
+                according to the source and sends it to uploader_class.
+            uploader_class: Derived class of BaseUploader, which will upload 
+                resources to somewhere.
+    """
+
     import_libs()
 
     derived_classes = { 
@@ -124,6 +174,11 @@ def check_config(config):
 
 # command line arguments: lib_path conf_path log_path task
 if __name__ == "__main__":
+    """ 
+    This is main function.
+    It writes pid log and call job manager to start submitting jobs, 
+    or call uploader to start uploading.
+    """
 
     # check command line arguments
     check_result = check_args(sys.argv)
