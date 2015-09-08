@@ -25,7 +25,7 @@ class BaseJobManager(object):
 
     Attributes:
         mandatory_options: Configuration options required by this class. This is
-            a list of tuples which contains two strings, section name and 
+            a list of tuples each of which contains two strings, section name and 
             property name, both of which are case-insensitive.
 
         config: Copy of configuration
