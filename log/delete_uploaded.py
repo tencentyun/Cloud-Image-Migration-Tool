@@ -21,7 +21,7 @@ def extract_fileid(db_file):
     conn = sqlite3.connect(db_file)
     conn.text_factory = str
     cur = conn.cursor()
-    cur.execute("SELECT fileid from jobs")
+    cur.execute("SELECT fileid FROM jobs WHERE status <> 0")
     for row in cur:
         fileid_list.append(row[0])
 
