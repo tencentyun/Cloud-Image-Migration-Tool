@@ -94,6 +94,9 @@ class BaseJobManager(object):
         else:
             self.fileid_ignore_execute = None
 
+        self.exec_namespace = {}
+        exec "pass" in self.exec_namespace
+
         self.new_submitted = 0
         self.ignore = 0
         self.submit_error = 0
@@ -155,6 +158,7 @@ class BaseJobManager(object):
         # You can give a custom function to determine whether or not to 
         # ignore this job according to the original fileid and source
         # you can also modify the original fileid or source
+        # code is executed in the same namespace every time
         # variables available: 
         #   input: fileid: original fileid
         #          src: original source    
@@ -162,9 +166,13 @@ class BaseJobManager(object):
         #           src: new source
         #           ignore: ignore this job if this is True
         def custom_fileid_ignore_func(fileid, src, codes):
-            ns = { "fileid": fileid, "src": src, "ignore": False }
-            exec codes in ns
-            return (ns["fileid"], ns["src"], ns["ignore"])
+            self.exec_namespace["fileid"] = fileid
+            self.exec_namespace["src"] = src
+            self.exec_namespace["ignore"] = False
+            exec codes in self.exec_namespace
+            return (self.exec_namespace["fileid"], 
+                    self.exec_namespace["src"],
+                    self.exec_namespace["ignore"])
 
         if self.fileid_ignore_execute:
             (fileid, src, ignore) = custom_fileid_ignore_func(fileid, src, self.fileid_ignore_execute)
