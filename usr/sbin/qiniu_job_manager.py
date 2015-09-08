@@ -38,6 +38,11 @@ class QiniuJobManager(BaseJobManager):
         ("qiniu", "qiniu.domain"),
         ("qiniu", "qiniu.isprivate"),
                         ]
+    def __init__(self, config):
+        """
+        Initialize base class.
+        """
+        super(QiniuJobManager, self).__init__(config)
 
     @staticmethod
     def check_config(config):
