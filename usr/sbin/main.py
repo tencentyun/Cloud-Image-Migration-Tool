@@ -105,9 +105,8 @@ def check_config(config):
     Check configurations in config.ini.
 
     Args:
-        config: A dict whose key is section name of config file, and value is 
-            another dict. The secondary dict's key is property name and value is
-            property value.
+        config: A second-level dict containing configurations. See also in 
+            ConfigLoader module.
 
     Returns:
         Returns a string containing error message if there are errors in
