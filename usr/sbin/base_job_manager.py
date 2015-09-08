@@ -72,6 +72,10 @@ class BaseJobManager(object):
             self.db_cursor.execute("INSERT INTO metadata VALUES ('successful', '0')")
             self.db_cursor.execute("INSERT INTO metadata VALUES ('failed', '0')")
             self.db_cursor.execute("INSERT INTO metadata VALUES ('last_selected', '0')")
+        
+        self.db_cursor.execute("SELECT value FROM metadata WHERE key = 'submitted'")
+        self.already_submitted = int(self.db_cursor.fetchone()[0])
+
         self.db_connect.commit()
 
         if "advanced" in config and "fileid.ignore.if" in config["advanced"]:
@@ -99,7 +103,8 @@ class BaseJobManager(object):
 
     def __del__(self):
         self.db_cursor.execute(
-            "UPDATE metadata SET value = value + ? WHERE key = 'submitted'", (self.new_submitted, )
+            "UPDATE metadata SET value = ? WHERE key = 'submitted'",
+            (self.already_submitted + self.new_submitted, )
         )
 
         self.db_connect.commit()
@@ -178,6 +183,10 @@ class BaseJobManager(object):
 
         if self.db_last_commit + self.db_commit_interval < time.time():
             try:
+                self.db_cursor.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'submitted'",
+                    (self.already_submitted + self.new_submitted, )
+                )
                 self.db_connect.commit()
                 self.db_last_commit = time.time()
             except sqlite3.Error:
