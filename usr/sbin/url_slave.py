@@ -11,7 +11,6 @@
  #  E-mail: hoojamis@gmail.com
  #  Date: Sep  7, 2015
  #  Time: 14:29:44
- #  Description: derived slave for downloading URL
 ###############################################################################
 
 from __future__ import print_function
@@ -21,7 +20,21 @@ import urllib
 import urllib2
 
 class URLSlave(BaseSlave):
+    """
+    Derived class of BaseSlave.
+    Retrieve a resource via URL and send it along with file id to uploader.
+
+    Attributes:
+        uploader_class: uploader class instance
+    """
     def __init__(self, config, UploaderClass):
+        """
+        Initialize base class and uploader class instance.
+
+        Args:
+            config: configuration dict
+            UploaderClass: uploader class
+        """
         super(URLSlave, self).__init__(config)
         self.uploader_class = UploaderClass(config)
     
@@ -34,13 +47,29 @@ class URLSlave(BaseSlave):
 
         return (req.get_code(), r.read())
 
-    # implementation of abstract method
     def do_job(self, job):
         """
-        type job: (index, fileid, old_status, source)
-        rtype: (index, new fileid, old_status, new_status, log)
+        Implementation of abstract method.
+        Download the URL and send the downloaded data along with file id to uploader.
         
-        do not throw any exception
+        Args:
+            job: a tuple of (index, fileid, old_status, source)
+                index: integer, serial number of the job
+                fileid: string, file id of the job
+                old_status: integer, old status of the job. 0 -- new submitted, 1 -- successful, 2 -- failed
+                source: string, source of the job
+
+        Returns:
+            log: a tuple of (index, fileid, old_status, new_status, log)
+                index: keep the same with that in argument job
+                fileid: string, new file id of the job, could be same or different 
+                    with that in argument
+                old_status: keep the same with that in argument
+                new_status: integer, new status of the job
+                log: log in string
+
+        Raises:
+            DO NOT raise any exception in this function.
         """
  
         serial = job[0]
