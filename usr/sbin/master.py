@@ -296,7 +296,6 @@ class Master(object):
         Fill job_queue from job_queue_buffer.
         Fill buffer if buffer is clear.
         """
-        print("fill job queue")
         for _ in range(self.job_queue_max_size - self.job_queue_size):
             if not self.job_queue_buffer:
                 self.load_job()
