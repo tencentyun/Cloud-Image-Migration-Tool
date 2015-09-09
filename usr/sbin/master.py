@@ -296,13 +296,21 @@ class Master(object):
         Fill job_queue from job_queue_buffer.
         Fill buffer if buffer is clear.
         """
-        for _ in range(self.job_queue_max_size - self.job_queue_size):
+        chunk_size = 10
+        while (self.job_queue_max_size > self.job_queue_size):
             if not self.job_queue_buffer:
                 self.load_job()
                 if not self.job_queue_buffer:
                     break
-            self.job_queue.put(self.job_queue_buffer.popleft())
-            self.job_queue_size += 1
+            
+            jobs = []
+            for _ in range(min(chunk_size, len(self.job_queue_buffer), self.job_queue_max_size - self.job_queue_size)):
+                job = self.job_queue_buffer.popleft()
+                jobs.append(job)
+                if job == "no more jobs":
+                    break
+            self.job_queue.put(jobs)
+            self.job_queue_size += len(jobs)
 
     def start(self):
         """ 
@@ -336,15 +344,17 @@ class Master(object):
             if self.job_queue_size < self.job_queue_reload_size:
                 self.fill_job_queue() 
             # fetch a log
-            log = self.log_queue.get()
+            logs = self.log_queue.get()
             # handle log
-            if log == "quit":
+            if logs == "quit":
+                self.job_queue_size -= 1
                 num_quit += 1
                 if num_quit == len(self.slaves):
                     break
             else:
-                self.write_log(log)
-            self.job_queue_size -= 1
+                self.job_queue_size -= len(logs)
+                for log in logs:
+                    self.write_log(log)
 
         self.db_connect.commit()
 

@@ -122,11 +122,14 @@ class BaseSlave(object):
                 log_queue.put("quit")
                 break
 
-            job = job_queue.get()
-
-            if job == "no more jobs":
-                self.interrupted = True
-            else:
-                log_queue.put(self.do_job(job))
+            jobs = job_queue.get()
+            logs = []
+            
+            for job in jobs:
+                if job == "no more jobs":
+                    self.interrupted = True
+                else:
+                    logs.append(self.do_job(job))
+            log_queue.put(logs)
 
 
