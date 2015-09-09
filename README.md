@@ -36,6 +36,7 @@ start.sh脚本首先扫描待上传的任务提交到任务列表，然后开始
 
 ##配置文件
 
+配置文件位于conf/config.ini，请参照config.ini.template和以下说明编写配置文件。
 配置文件中section name和property name (option name)不区分大小写；value除特殊说明外，区分大小写。
 
 ###上传类型
