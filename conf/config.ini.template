@@ -18,7 +18,7 @@ url.url_list_file_path = /root/urllist
 qiniu.bucket = my_bucket_name
 qiniu.AccessKey = _17terLxP-ZK7tma9jXgm7MuEOk72yP9OZBIP35G
 qiniu.SecretKey = PFw6JivhTAdNKRojaguUkC6tlFHAI9SBrjVYdfya
-; domain should start with http end up with "/"
+; domain should start with http
 qiniu.domain = http://aaaaa.glb.clouddn.com/
 ; should start with http, leave it blank if none
 qiniu.referer = 
