@@ -92,6 +92,7 @@ class QiniuJobManager(BaseJobManager):
         eof = False
         while eof is False:
             (ret, eof, info) = bucket.list(bucket_name, prefix = None, marker = marker, limit = None)
+            if ret is None: break
             marker = ret.get("marker", None)
             for item in ret["items"]:
                 fileid = item["key"].encode("utf-8")
