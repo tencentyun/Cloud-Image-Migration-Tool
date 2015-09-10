@@ -227,9 +227,14 @@ class Master(object):
                 log: log in string
 
         """
-        self.db_cursor.execute(
-            "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
-        )
+        try:
+            self.db_cursor.execute(
+                "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, fileid, log, serial)
+            )
+        except sqlite3.IntegrityError:
+            self.db_cursor.execute(
+                "UPDATE jobs SET status = ?, fileid = ?, log = ? WHERE serial = ?", (status, None, log, serial)
+            )
 
         if status == 1 and old_status == 0:
             update_values = [ (1, "successful") ]
