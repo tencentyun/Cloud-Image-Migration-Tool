@@ -93,7 +93,7 @@ class BaseJobManager(object):
             self.db_cursor.execute(
                 """CREATE TABLE jobs (
                     serial INTEGER PRIMARY KEY,
-                    fileid TEXT NOT NULL UNIQUE, 
+                    fileid TEXT UNIQUE, 
                     status INT NOT NULL, 
                     src TEXT, 
                     log TEXT)
