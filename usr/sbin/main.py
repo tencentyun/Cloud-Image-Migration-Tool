@@ -44,6 +44,8 @@ def import_libs():
     """
     global CloudImageV2Uploader  
     from civ2_uploader import CloudImageV2Uploader
+    global MD5CloudImageV2Uploader
+    from md5_civ2_uploader import MD5CloudImageV2Uploader
     global QiniuJobManager
     from qiniu_job_manager import QiniuJobManager
 
@@ -129,6 +131,7 @@ def check_config(config):
         "Local": (LocalFSJobManager, URLSlave, CloudImageV2Uploader),
         "URLList": (URLListJobManager, URLSlave, CloudImageV2Uploader),
         "Qiniu": (QiniuJobManager, URLSlave, CloudImageV2Uploader),
+        "Local_MD5": (LocalFSJobManager, URLSlave, MD5CloudImageV2Uploader),
                       }
 
     # check config for base job manager
@@ -145,6 +148,9 @@ def check_config(config):
     check_result  = BaseUploader.check_config(config)
     if check_result:
         return check_reuslt
+
+    if config["migrateinfo"]["migrate.type"] not in derived_classes:
+        return "Error: Unsupported Migrateinfo.migrate.type %s" % config["migrateinfo"]["migrate.type"]
     
     class_type = config["migrateinfo"]["migrate.type"]
     job_manager_class = derived_classes[class_type][0]
