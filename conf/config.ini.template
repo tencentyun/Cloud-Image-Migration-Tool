@@ -2,7 +2,7 @@
 ; section names and property names are case insensitive
 
 [MigrateInfo]
-; Local | URLList | Qiniu
+; Local | URLList | Qiniu | Oss
 migrate.type = Local
 
 [Local]
@@ -24,6 +24,14 @@ qiniu.domain = http://aaaaa.glb.clouddn.com/
 qiniu.referer = 
 ; 1 or ture on this bucket is private
 qiniu.isprivate = False
+
+[Oss]
+oss.bucket = my_bucket_name
+oss.accesskey = _17terLxP-ZK7tma9jXgm7MuEOk72yP9OZBIP35G
+oss.secretkey = PFw6JivhTAdNKRojaguUkC6tlFHAI9SBrjVYdfya
+oss.endpoint = oss-cn-hangzhou.aliyuncs.com
+; 1 or ture on this endpoint is CNAME
+oss.iscname = False
 
 [AppInfo]
 appinfo.appid = 10000000

@@ -48,6 +48,10 @@ def import_libs():
     from md5_civ2_uploader import MD5CloudImageV2Uploader
     global QiniuJobManager
     from qiniu_job_manager import QiniuJobManager
+    global OssSlave
+    from oss_slave import OssSlave
+    global OssJobManager
+    from oss_job_manager import OssJobManager
 
 def check_args(argv):
     """
@@ -132,6 +136,7 @@ def check_config(config):
         "URLList": (URLListJobManager, URLSlave, CloudImageV2Uploader),
         "Qiniu": (QiniuJobManager, URLSlave, CloudImageV2Uploader),
         "Local_MD5": (LocalFSJobManager, URLSlave, MD5CloudImageV2Uploader),
+        "Oss": (OssJobManager, OssSlave, CloudImageV2Uploader),
                       }
 
     # check config for base job manager
